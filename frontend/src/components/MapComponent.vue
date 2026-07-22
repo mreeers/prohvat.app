@@ -76,18 +76,6 @@ const fetchCategories = async () => {
   }
 }
 
-const joinRide = async (rideId: string) => {
-  try {
-    await axios.post(`http://localhost:8081/api/rides/${rideId}/join`, {}, {
-      headers: { 'Authorization': `Bearer ${authStore.token}` }
-    })
-    alert("Успешно присоединились к покатушке!")
-    if (map) fetchEvents(map.getBounds())
-  } catch (err: any) {
-    alert(err.response?.data?.Error || "Ошибка при присоединении")
-  }
-}
-
 const createEvent = async () => {
   createError.value = ''
   if (!newTitle.value.trim()) { createError.value = 'Введите название'; return }
