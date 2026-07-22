@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "H7AnKwtcLM4=",
+  "dgSpecHash": "xYk5iq9UzKQ=",
   "success": true,
-  "projectFilePath": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Application\\ProhvatApp.Application.csproj",
+  "projectFilePath": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Application\\ProhvatApp.Application.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\verpl\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\verpl\\.nuget\\packages\\fluentvalidation\\12.1.1\\fluentvalidation.12.1.1.nupkg.sha512",

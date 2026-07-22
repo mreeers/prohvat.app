@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "8dgjtGBvDgU=",
+  "dgSpecHash": "fY0oykPK/Nk=",
   "success": true,
-  "projectFilePath": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.WebAPI\\ProhvatApp.WebAPI.csproj",
+  "projectFilePath": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.WebAPI\\ProhvatApp.WebAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\verpl\\.nuget\\packages\\awssdk.core\\4.0.9.4\\awssdk.core.4.0.9.4.nupkg.sha512",
     "C:\\Users\\verpl\\.nuget\\packages\\awssdk.s3\\4.0.25.1\\awssdk.s3.4.0.25.1.nupkg.sha512",

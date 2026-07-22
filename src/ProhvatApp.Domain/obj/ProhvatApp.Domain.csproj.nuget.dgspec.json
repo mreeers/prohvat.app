@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj": {}
+    "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj": {}
   },
   "projects": {
-    "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj": {
+    "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj",
+        "projectUniqueName": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj",
         "projectName": "ProhvatApp.Domain",
-        "projectPath": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj",
+        "projectPath": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj",
         "packagesPath": "C:\\Users\\verpl\\.nuget\\packages\\",
-        "outputPath": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\obj\\",
+        "outputPath": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -71,7 +71,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.315/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.316/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
