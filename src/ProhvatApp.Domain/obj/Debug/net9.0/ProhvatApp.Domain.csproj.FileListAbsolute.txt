@@ -10,3 +10,4 @@ C:\Repos\prohvat.app\src\ProhvatApp.Domain\obj\Debug\net9.0\ProhvatApp.Domain.dl
 C:\Repos\prohvat.app\src\ProhvatApp.Domain\obj\Debug\net9.0\refint\ProhvatApp.Domain.dll
 C:\Repos\prohvat.app\src\ProhvatApp.Domain\obj\Debug\net9.0\ProhvatApp.Domain.pdb
 C:\Repos\prohvat.app\src\ProhvatApp.Domain\obj\Debug\net9.0\ref\ProhvatApp.Domain.dll
+C:\Repos\prohvat.app\src\ProhvatApp.Domain\obj\Debug\net9.0\ProhvatApp.Domain.sourcelink.json

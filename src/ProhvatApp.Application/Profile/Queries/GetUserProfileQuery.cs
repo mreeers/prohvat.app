@@ -46,6 +46,7 @@ public class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileQuery, U
             Username = user.Username ?? string.Empty,
             AvatarUrl = user.AvatarUrl ?? string.Empty,
             Bio = user.Bio ?? string.Empty,
+            IsVisibleOnMap = user.IsVisibleOnMap,
             CityId = user.CityId,
             CityName = user.City != null ? user.City.Name : null,
             CityLat = user.City != null ? user.City.CenterLat : null,

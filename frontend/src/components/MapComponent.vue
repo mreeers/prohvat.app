@@ -18,6 +18,7 @@ let currentLng = 37.6173
 
 const rides = ref<any[]>([])
 const spots = ref<any[]>([])
+const activeRiders = ref<any[]>([])
 const categories = ref<any[]>([])
 
 // Create Event State
@@ -63,6 +64,16 @@ const fetchEvents = async (bounds: number[][]) => {
     updateMapMarkers()
   } catch (err) {
     console.error('Failed to fetch events', err)
+  }
+}
+
+const fetchActiveRiders = async () => {
+  try {
+    const res = await axios.get('http://localhost:8081/api/profile/active-riders')
+    activeRiders.value = res.data
+    updateMapMarkers()
+  } catch (err) {
+    console.error('Failed to fetch active riders', err)
   }
 }
 
@@ -151,6 +162,26 @@ const updateMapMarkers = () => {
     })
     map.geoObjects.add(placemark)
   })
+
+  // Add Active Riders
+  activeRiders.value.forEach(rider => {
+    const isStreet = rider.vehicleCategoryName === 'Дорожный мотоцикл'
+    const ringColor = isStreet ? '#2196f3' : '#ff9800'
+    const avatar = rider.avatarUrl ? (rider.avatarUrl.startsWith('http') ? rider.avatarUrl : 'http://localhost:8081' + rider.avatarUrl) : 'https://ui-avatars.com/api/?name=' + rider.username
+    const vehicleText = rider.vehicleName ? `<br>🏍️ ${rider.vehicleName}` : ''
+
+    const placemark = new ymaps.Placemark([rider.latitude, rider.longitude], {
+      balloonContentHeader: `<b>@${rider.username}</b>`,
+      balloonContentBody: `<p>Сейчас катается!${vehicleText}</p>`
+    }, {
+      iconLayout: 'default#imageWithContent',
+      iconImageHref: '',
+      iconContentLayout: ymaps.templateLayoutFactory.createClass(
+        `<div style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid ${ringColor}; box-shadow: 0 0 10px rgba(0,0,0,0.5); background-image: url('${avatar}'); background-size: cover; background-position: center; background-color: #333;"></div>`
+      )
+    })
+    map.geoObjects.add(placemark)
+  })
 }
 
 const initMap = async () => {
@@ -194,8 +225,11 @@ const initMap = async () => {
     })
 
     fetchEvents(map.getBounds())
+    fetchActiveRiders()
   })
 }
+
+let activeRidersInterval: any = null
 
 onMounted(() => {
   fetchCategories()
@@ -244,6 +278,15 @@ onMounted(() => {
       })
     }, 180000)
   }
+
+  // Poll active riders every 30 seconds
+  activeRidersInterval = setInterval(() => {
+    fetchActiveRiders()
+  }, 30000)
+})
+
+onUnmounted(() => {
+  if (activeRidersInterval) clearInterval(activeRidersInterval)
 })
 
 const sendSos = async () => {

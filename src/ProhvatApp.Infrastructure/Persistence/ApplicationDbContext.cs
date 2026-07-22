@@ -223,7 +223,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             new VehicleCategory { Id = Guid.Parse("22222222-2222-2222-2222-222222222222"), Name = "Снегоходы", Season = ProhvatApp.Domain.Enums.SeasonType.Winter, Metric = ProhvatApp.Domain.Enums.MetricType.Kilometers },
             new VehicleCategory { Id = Guid.Parse("33333333-3333-3333-3333-333333333333"), Name = "Боевая Классика", Season = ProhvatApp.Domain.Enums.SeasonType.AllSeason, Metric = ProhvatApp.Domain.Enums.MetricType.Kilometers },
             new VehicleCategory { Id = Guid.Parse("44444444-4444-4444-4444-444444444444"), Name = "Питбайк", Season = ProhvatApp.Domain.Enums.SeasonType.Summer, Metric = ProhvatApp.Domain.Enums.MetricType.Hours },
-            new VehicleCategory { Id = Guid.Parse("55555555-5555-5555-5555-555555555555"), Name = "Квадроцикл", Season = ProhvatApp.Domain.Enums.SeasonType.AllSeason, Metric = ProhvatApp.Domain.Enums.MetricType.Kilometers }
+            new VehicleCategory { Id = Guid.Parse("55555555-5555-5555-5555-555555555555"), Name = "Квадроцикл", Season = ProhvatApp.Domain.Enums.SeasonType.AllSeason, Metric = ProhvatApp.Domain.Enums.MetricType.Kilometers },
+            new VehicleCategory { Id = Guid.Parse("66666666-6666-6666-6666-666666666666"), Name = "Дорожный мотоцикл", Season = ProhvatApp.Domain.Enums.SeasonType.Summer, Metric = ProhvatApp.Domain.Enums.MetricType.Kilometers }
         );
     }
 }

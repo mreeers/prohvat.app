@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProhvatApp.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4045dc94c8e8b2a2826426c8137aa3e6268b2cc7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+739718803a25778ba4c4bcbd7025649808895606")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProhvatApp.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProhvatApp.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

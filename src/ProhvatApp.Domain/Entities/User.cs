@@ -18,6 +18,7 @@ public class User
     public City? City { get; set; }
     public Point? LastKnownLocation { get; set; }
     public DateTime? LocationUpdatedAt { get; set; }
+    public bool IsVisibleOnMap { get; set; } = false;
     
     // Navigation properties
     public List<Vehicle> Vehicles { get; set; } = new();

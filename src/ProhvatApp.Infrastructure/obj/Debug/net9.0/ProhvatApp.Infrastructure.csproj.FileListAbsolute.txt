@@ -16,3 +16,4 @@ C:\Repos\prohvat.app\src\ProhvatApp.Infrastructure\obj\Debug\net9.0\ProhvatApp.I
 C:\Repos\prohvat.app\src\ProhvatApp.Infrastructure\obj\Debug\net9.0\refint\ProhvatApp.Infrastructure.dll
 C:\Repos\prohvat.app\src\ProhvatApp.Infrastructure\obj\Debug\net9.0\ProhvatApp.Infrastructure.pdb
 C:\Repos\prohvat.app\src\ProhvatApp.Infrastructure\obj\Debug\net9.0\ref\ProhvatApp.Infrastructure.dll
+C:\Repos\prohvat.app\src\ProhvatApp.Infrastructure\obj\Debug\net9.0\ProhvatApp.Infrastructure.sourcelink.json

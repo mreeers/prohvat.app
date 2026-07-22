@@ -18,6 +18,7 @@ const loading = ref(true)
 const isEditing = ref(false)
 const editUsername = ref('')
 const editBio = ref('')
+const editIsVisibleOnMap = ref(false)
 const selectedAvatarFile = ref<File | null>(null)
 const saveError = ref('')
 const saveSuccess = ref(false)
@@ -62,6 +63,7 @@ const fetchProfile = async () => {
     isOwner.value = authStore.isAuthenticated() && authStore.user?.username === usernameParam
     editUsername.value = profile.value.username
     editBio.value = profile.value.bio
+    editIsVisibleOnMap.value = profile.value.isVisibleOnMap || false
     selectedCityId.value = profile.value.cityId
     searchCityTerm.value = profile.value.cityName || ''
     
@@ -100,6 +102,12 @@ const saveProfile = async () => {
 
     await axios.put(`http://localhost:8081/api/profile`, formData, {
       headers: { 'Authorization': `Bearer ${authStore.token}`, 'Content-Type': 'multipart/form-data' }
+    })
+    
+    await axios.put(`http://localhost:8081/api/profile/visibility`, {
+      isVisible: editIsVisibleOnMap.value
+    }, {
+      headers: { 'Authorization': `Bearer ${authStore.token}` }
     })
 
     saveSuccess.value = true
@@ -301,6 +309,13 @@ onMounted(() => {
             <div class="form-group">
               <label class="field-label">О себе</label>
               <textarea v-model="editBio" placeholder="Расскажи о себе, своём стиле езды, любимых маршрутах..." class="input-field textarea"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="field-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" v-model="editIsVisibleOnMap" />
+                <span>Показывать меня на карте (для других)</span>
+              </label>
             </div>
 
             <div v-if="saveError" class="form-error">⚠️ {{ saveError }}</div>

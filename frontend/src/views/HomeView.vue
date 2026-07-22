@@ -19,7 +19,7 @@ const appStore = useAppStore()
         </div>
       </div>
       <div class="season-label">
-        {{ appStore.currentSeason === 'enduro' ? 'Enduro Season' : 'Snowmobile Season' }}
+        {{ appStore.currentSeason === 'enduro' ? 'Летний сезон' : 'Зимний сезон' }}
       </div>
     </div>
   </div>

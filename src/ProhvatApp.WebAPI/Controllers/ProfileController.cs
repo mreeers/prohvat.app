@@ -113,6 +113,23 @@ public class ProfileController : ControllerBase
         var success = await _mediator.Send(new UnblockUserCommand(userId, id));
         return Ok(new { Success = success });
     }
+
+    [HttpPut("visibility")]
+    public async Task<IActionResult> ToggleVisibility([FromBody] ToggleVisibilityApiRequest request)
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdStr, out var userId)) return Unauthorized();
+
+        var success = await _mediator.Send(new ToggleMapVisibilityCommand(userId, request.IsVisible));
+        return Ok(new { success });
+    }
+
+    [HttpGet("active-riders")]
+    public async Task<IActionResult> GetActiveRiders()
+    {
+        var riders = await _mediator.Send(new GetActiveRidersQuery());
+        return Ok(riders);
+    }
 }
 
 public class UpdateLocationApiRequest
@@ -128,4 +145,9 @@ public class UpdateProfileApiRequest
     public IFormFile? AvatarFile { get; set; }
     public string? AvatarUrl { get; set; }
     public Guid? CityId { get; set; }
+}
+
+public class ToggleVisibilityApiRequest
+{
+    public bool IsVisible { get; set; }
 }

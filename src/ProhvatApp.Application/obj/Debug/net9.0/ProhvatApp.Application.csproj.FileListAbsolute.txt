@@ -13,3 +13,4 @@ C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\ProhvatApp.Appl
 C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\refint\ProhvatApp.Application.dll
 C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\ProhvatApp.Application.pdb
 C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\ref\ProhvatApp.Application.dll
+C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\ProhvatApp.Application.sourcelink.json
