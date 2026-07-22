@@ -1,0 +1,93 @@
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: prohvat-db
+    environment:
+      POSTGRES_USER: prohvat_user
+      POSTGRES_PASSWORD: prohvat_password
+      POSTGRES_DB: prohvat_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: src/ProhvatApp.WebAPI/Dockerfile
+    container_name: prohvat-backend
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=prohvat_db;Username=prohvat_user;Password=prohvat_password;
+      - ASPNETCORE_ENVIRONMENT=Development
+      - S3Storage__Endpoint=http://minio:9000
+      - Redis__ConnectionString=redis:6379
+      - RabbitMQ__Host=rabbitmq
+      - MongoDB__ConnectionString=mongodb://mongo:27017
+      - MongoDB__DatabaseName=prohvat_logs
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+      - mongo
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: prohvat-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    container_name: prohvat-minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine
+    container_name: prohvat-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: prohvat-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:latest
+    container_name: prohvat-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  minio_data:
+  mongo_data:

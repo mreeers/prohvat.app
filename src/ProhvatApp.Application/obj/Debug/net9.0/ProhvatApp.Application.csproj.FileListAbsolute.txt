@@ -1,0 +1,15 @@
+C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\ProhvatApp.Application.csproj.AssemblyReference.cache
+C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\ProhvatApp.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\ProhvatApp.Application.AssemblyInfoInputs.cache
+C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\ProhvatApp.Application.AssemblyInfo.cs
+C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\ProhvatApp.Application.csproj.CoreCompileInputs.cache
+C:\Repos\prohvat.app\src\ProhvatApp.Application\bin\Debug\net9.0\ProhvatApp.Application.deps.json
+C:\Repos\prohvat.app\src\ProhvatApp.Application\bin\Debug\net9.0\ProhvatApp.Application.dll
+C:\Repos\prohvat.app\src\ProhvatApp.Application\bin\Debug\net9.0\ProhvatApp.Application.pdb
+C:\Repos\prohvat.app\src\ProhvatApp.Application\bin\Debug\net9.0\ProhvatApp.Domain.dll
+C:\Repos\prohvat.app\src\ProhvatApp.Application\bin\Debug\net9.0\ProhvatApp.Domain.pdb
+C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\ProhvatA.B205F61F.Up2Date
+C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\ProhvatApp.Application.dll
+C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\refint\ProhvatApp.Application.dll
+C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\ProhvatApp.Application.pdb
+C:\Repos\prohvat.app\src\ProhvatApp.Application\obj\Debug\net9.0\ref\ProhvatApp.Application.dll

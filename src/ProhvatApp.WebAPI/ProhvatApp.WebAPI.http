@@ -1,0 +1,6 @@
+@ProhvatApp.WebAPI_HostAddress = http://localhost:5193
+
+GET {{ProhvatApp.WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

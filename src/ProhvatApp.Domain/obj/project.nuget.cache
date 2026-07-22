@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "2SvoTCZq7Oo=",
+  "success": true,
+  "projectFilePath": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\verpl\\.nuget\\packages\\nettopologysuite\\2.6.0\\nettopologysuite.2.6.0.nupkg.sha512"
+  ],
+  "logs": []
+}
