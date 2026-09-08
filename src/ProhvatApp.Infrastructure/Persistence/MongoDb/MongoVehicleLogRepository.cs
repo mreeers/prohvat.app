@@ -33,6 +33,24 @@ public class MongoVehicleLogRepository : IVehicleLogRepository
         await _context.VehicleLogs.ReplaceOneAsync(x => x.Id == log.Id, log, new ReplaceOptions(), cancellationToken);
     }
 
+    public async Task<List<VehicleLog>> GetRecentLogsAsync(List<Guid>? vehicleIds = null, int limit = 50, CancellationToken cancellationToken = default)
+    {
+        if (vehicleIds != null && vehicleIds.Any())
+        {
+            return await _context.VehicleLogs
+                .Find(x => vehicleIds.Contains(x.VehicleId))
+                .SortByDescending(x => x.CreatedAt)
+                .Limit(limit)
+                .ToListAsync(cancellationToken);
+        }
+
+        return await _context.VehicleLogs
+            .Find(_ => true)
+            .SortByDescending(x => x.CreatedAt)
+            .Limit(limit)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         await _context.VehicleLogs.DeleteOneAsync(x => x.Id == id, cancellationToken);

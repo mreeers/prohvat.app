@@ -8,5 +8,6 @@ public interface IVehicleLogRepository
     Task<List<VehicleLog>> GetByVehicleIdAsync(Guid vehicleId, CancellationToken cancellationToken = default);
     Task AddAsync(VehicleLog log, CancellationToken cancellationToken = default);
     Task UpdateAsync(VehicleLog log, CancellationToken cancellationToken = default);
+    Task<List<VehicleLog>> GetRecentLogsAsync(List<Guid>? vehicleIds = null, int limit = 50, CancellationToken cancellationToken = default);
     Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 }
