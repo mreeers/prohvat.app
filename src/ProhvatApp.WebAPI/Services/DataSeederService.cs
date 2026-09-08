@@ -154,9 +154,9 @@ public class DataSeederService : IHostedService
 
     private async Task SeedUsersAndSocialContentAsync(ApplicationDbContext context, IVehicleLogRepository? logRepo, CancellationToken cancellationToken)
     {
-        if (await context.Users.AnyAsync(cancellationToken))
+        if (await context.Users.AnyAsync(u => u.Email == "alex@prohvat.app", cancellationToken))
         {
-            _logger.LogInformation("Users already exist. Skipping demo users seeding.");
+            _logger.LogInformation("Demo users already exist. Skipping demo seeding.");
             return;
         }
 
@@ -237,6 +237,16 @@ public class DataSeederService : IHostedService
             new Friendship { Id = Guid.NewGuid(), RequesterId = userAlex.Id, AddresseeId = userSergey.Id, Status = 1 },
             new Friendship { Id = Guid.NewGuid(), RequesterId = userDaria.Id, AddresseeId = userIvan.Id, Status = 1 }
         );
+
+        var existingOtherUsers = await context.Users
+            .Where(u => u.Id != userAlex.Id && u.Id != userDaria.Id && u.Id != userIvan.Id && u.Id != userSergey.Id)
+            .ToListAsync(cancellationToken);
+
+        foreach (var other in existingOtherUsers)
+        {
+            context.Friendships.Add(new Friendship { Id = Guid.NewGuid(), RequesterId = other.Id, AddresseeId = userAlex.Id, Status = 1 });
+            context.Friendships.Add(new Friendship { Id = Guid.NewGuid(), RequesterId = other.Id, AddresseeId = userDaria.Id, Status = 1 });
+        }
 
         // 3. Vehicles
         var alexKtm = new Vehicle
