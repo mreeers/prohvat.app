@@ -80,7 +80,9 @@
   * Скрипт `deploy.sh` обновлен и поддерживает как автоматический деплой, так и ручной запуск на сервере.
   * Все 7 сервисов (Postgres+PostGIS, Redis, RabbitMQ, MongoDB 4.4, MinIO, Backend, Frontend) успешно работают в Docker.
   * Reverse Proxy (Nginx) маршрутизирует веб-интерфейс (порт 80/8080), API (`/api/`), SignalR (`/hubs/`) и хранилище S3 (`/s3/`).
-* **UI/UX фиксы:** Исправлен полноэкранный режим карты при редизайне под VK-стиль, исправлены TS lib зависимости.
+* **UI/UX и TypeScript фиксы:** 
+  * Исправлен полноэкранный режим карты при редизайне под VK-стиль.
+  * Добавлен корневой `tsconfig.json` со ссылками на проекты frontend, исправлен `frontend/tsconfig.node.json` (устранены ошибки обнаружения типов Node в IDE).
 
 ### 7. Мониторинг и логирование (Prometheus + Grafana, ELK / Seq)
 * Настроить сбор метрик (.NET EventCounters, Prometheus endpoint) для отслеживания нагрузки (CPU, Memory, GC) и RPS.
