@@ -133,3 +133,4 @@ C:\Repos\prohvat.app\src\ProhvatApp.Application.Tests\obj\Debug\net9.0\ref\Prohv
 C:\Repos\prohvat.app\src\ProhvatApp.Application.Tests\bin\Debug\net9.0\MockQueryable.Core.dll
 C:\Repos\prohvat.app\src\ProhvatApp.Application.Tests\bin\Debug\net9.0\MockQueryable.EntityFrameworkCore.dll
 C:\Repos\prohvat.app\src\ProhvatApp.Application.Tests\bin\Debug\net9.0\MockQueryable.Moq.dll
+C:\Repos\prohvat.app\src\ProhvatApp.Application.Tests\obj\Debug\net9.0\ProhvatApp.Application.Tests.sourcelink.json

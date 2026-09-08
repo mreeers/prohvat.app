@@ -2,7 +2,7 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useAuthStore } from './stores/auth'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import api from './services/api'
 import { signalRService } from './services/signalr'
 
 const authStore = useAuthStore()
@@ -20,7 +20,7 @@ const handleLogout = () => {
 const fetchNotifications = async () => {
   if (!authStore.isAuthenticated()) return
   try {
-    const res = await axios.get('http://localhost:8081/api/social/notifications', {
+    const res = await api.get('/social/notifications', {
       headers: { 'Authorization': `Bearer ${authStore.token}` }
     })
     notifications.value = res.data
@@ -36,7 +36,7 @@ const handleReceiveNotification = (notification: any) => {
 const readNotification = async (notif: any) => {
   try {
     if (!notif.isRead) {
-      await axios.put(`http://localhost:8081/api/social/notifications/${notif.id}/read`, {}, {
+      await api.put(`/social/notifications/${notif.id}/read`, {}, {
         headers: { 'Authorization': `Bearer ${authStore.token}` }
       })
       notif.isRead = true
@@ -68,53 +68,87 @@ watch(() => authStore.token, (newToken) => {
 
 <template>
   <div class="app-container">
-    <nav class="navbar glass-panel">
-      <div class="logo">
-        <span class="prohvat">PROHVAT</span><span class="dot">.</span>APP
-      </div>
-      <div class="nav-links">
-        <router-link to="/" class="nav-link">🗺️ Карта</router-link>
-        <router-link to="/feed" class="nav-link">📜 Лента</router-link>
-        <router-link to="/tuning" class="nav-link">🔧 Тюнинг</router-link>
-        <template v-if="!authStore.isAuthenticated()">
-          <router-link to="/auth/login" class="btn-primary" style="padding: 8px 16px; text-decoration: none;">Войти</router-link>
-        </template>
-        <template v-else>
-          <router-link to="/garage" class="nav-link">🏍️ Гараж</router-link>
-          
-          <!-- Notifications Bell -->
-          <div class="notif-wrapper" style="position:relative;">
-            <button @click="showNotifications = !showNotifications" class="icon-btn">
-              🔔
-              <span v-if="unreadCount > 0" class="badge">{{ unreadCount }}</span>
-            </button>
-            <div v-if="showNotifications" class="notifications-dropdown glass-panel">
-              <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">Уведомления</h4>
-              <div v-if="notifications.length === 0" style="color:#aaa; font-size:0.9em;">Нет новых уведомлений</div>
-              <div v-for="n in notifications" :key="n.id" class="notif-item" :class="{ unread: !n.isRead }" @click="readNotification(n)">
-                {{ n.message }}
+    <!-- Top Fixed Header -->
+    <header class="top-header glass-panel">
+      <div class="header-content">
+        <div class="logo">
+          <span class="prohvat">PROHVAT</span><span class="dot">.</span>APP
+        </div>
+
+        <div class="header-right">
+          <template v-if="!authStore.isAuthenticated()">
+            <router-link to="/auth/login" class="btn-primary" style="padding: 8px 16px; text-decoration: none;">Войти</router-link>
+          </template>
+          <template v-else>
+            <!-- Notifications Bell -->
+            <div class="notif-wrapper">
+              <button @click="showNotifications = !showNotifications" class="icon-btn">
+                🔔
+                <span v-if="unreadCount > 0" class="badge">{{ unreadCount }}</span>
+              </button>
+              <div v-if="showNotifications" class="notifications-dropdown glass-panel">
+                <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">Уведомления</h4>
+                <div v-if="notifications.length === 0" style="color:#aaa; font-size:0.9em;">Нет новых уведомлений</div>
+                <div v-for="n in notifications" :key="n.id" class="notif-item" :class="{ unread: !n.isRead }" @click="readNotification(n)">
+                  {{ n.message }}
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Profile Link -->
-          <router-link 
-            v-if="authStore.user?.username" 
-            :to="`/profile/${authStore.user.username}`" 
-            class="profile-nav-link"
-          >
-            <div class="avatar-mini">{{ authStore.user.username.charAt(0).toUpperCase() }}</div>
-            <span>@{{ authStore.user.username }}</span>
-          </router-link>
-          
-          <button @click="handleLogout" class="btn-secondary logout-btn">Выйти</button>
-        </template>
+            <!-- Profile Link in Header -->
+            <router-link 
+              v-if="authStore.user?.username" 
+              :to="`/profile/${authStore.user.username}`" 
+              class="profile-nav-link"
+            >
+              <div class="avatar-mini">{{ authStore.user.username.charAt(0).toUpperCase() }}</div>
+              <span>{{ authStore.user.username }}</span>
+            </router-link>
+            
+            <button @click="handleLogout" class="btn-secondary logout-btn">Выйти</button>
+          </template>
+        </div>
       </div>
-    </nav>
+    </header>
 
-    <main class="main-content">
-      <router-view />
-    </main>
+    <!-- Main Page Layout -->
+    <div class="page-layout">
+      <!-- Left Sidebar (VK Style) -->
+      <aside class="sidebar" v-if="authStore.isAuthenticated()">
+        <nav class="sidebar-nav">
+          <router-link :to="`/profile/${authStore.user?.username}`" class="sidebar-link">
+            <span class="icon">👤</span> Моя страница
+          </router-link>
+          <router-link to="/feed" class="sidebar-link">
+            <span class="icon">📰</span> Новости
+          </router-link>
+          <router-link to="/friends" class="sidebar-link">
+            <span class="icon">👥</span> Мои друзья
+          </router-link>
+          <router-link to="/map/users" class="sidebar-link">
+            <span class="icon">🗺️</span> Карта райдеров
+          </router-link>
+          <router-link to="/map/spots" class="sidebar-link">
+            <span class="icon">📍</span> Споты
+          </router-link>
+          <router-link to="/garage" class="sidebar-link">
+            <span class="icon">🏍️</span> Гараж
+          </router-link>
+          <router-link to="/videos" class="sidebar-link">
+            <span class="icon">🎥</span> Видео
+          </router-link>
+          <div class="sidebar-divider"></div>
+          <router-link to="/settings" class="sidebar-link">
+            <span class="icon">⚙️</span> Настройки
+          </router-link>
+        </nav>
+      </aside>
+
+      <!-- Center Content Area -->
+      <main class="content">
+        <router-view />
+      </main>
+    </div>
   </div>
 </template>
 
@@ -122,20 +156,33 @@ watch(() => authStore.token, (newToken) => {
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
 }
 
-.navbar {
+/* Header */
+.top-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  z-index: 1000;
+  border-radius: 0;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: var(--border-glass);
+  background: rgba(15, 17, 21, 0.85); /* Slightly darker for header */
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 32px;
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  right: 16px;
-  z-index: 1000;
-  border-radius: 12px;
+  padding: 0 16px;
 }
 
 .logo {
@@ -145,49 +192,81 @@ watch(() => authStore.token, (newToken) => {
   letter-spacing: -1px;
 }
 
-.prohvat {
-  color: var(--text-primary);
-}
+.prohvat { color: var(--text-primary); }
+.dot { color: var(--accent-primary); }
 
-.dot {
-  color: var(--accent-primary);
-}
-
-.nav-links {
+.header-right {
   display: flex;
-  gap: 24px;
+  gap: 16px;
   align-items: center;
 }
 
-.nav-links a {
+/* Page Layout */
+.page-layout {
+  display: flex;
+  max-width: 1200px;
+  margin: 72px auto 0 auto; /* 56px header + 16px gap */
+  padding: 0 16px;
+  width: 100%;
+  gap: 24px;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 72px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
   color: var(--text-primary);
   text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-.nav-links a:hover {
-  color: var(--accent-primary);
-}
-
-.nav-link {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: rgba(255,255,255,0.8) !important;
-  font-size: 0.9rem;
-  padding: 6px 10px;
-  border-radius: 8px;
+  font-size: 0.95rem;
+  border-radius: 6px;
   transition: all 0.2s ease;
 }
-.nav-link:hover {
-  color: white !important;
-  background: rgba(255,255,255,0.08);
-}
-.nav-link.router-link-active {
-  color: var(--accent-primary) !important;
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
+.sidebar-link.router-link-active {
+  background: rgba(255, 255, 255, 0.1);
+  font-weight: 600;
+  border-left: 3px solid var(--accent-primary);
+}
+
+.sidebar-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 8px 0;
+}
+
+.icon {
+  font-size: 1.1rem;
+  width: 20px;
+  text-align: center;
+}
+
+/* Content Area */
+.content {
+  flex: 1;
+  min-width: 0; /* Prevent overflow */
+  padding-bottom: 40px;
+}
+
+/* Shared Header UI Elements */
 .icon-btn {
   background: none;
   border: none;
@@ -253,27 +332,22 @@ watch(() => authStore.token, (newToken) => {
 
 .notif-wrapper { position: relative; }
 
-.main-content {
-  flex: 1;
-  position: relative;
-}
-
 .badge {
   position: absolute;
-  top: -5px;
-  right: -5px;
-  background: var(--primary-color);
+  top: -2px;
+  right: -2px;
+  background: var(--accent-primary);
   color: white;
   border-radius: 50%;
   padding: 2px 6px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: bold;
 }
 
 .notifications-dropdown {
   position: absolute;
-  top: 60px;
-  right: 16px;
+  top: 45px;
+  right: -10px;
   width: 300px;
   max-height: 400px;
   overflow-y: auto;
@@ -297,7 +371,7 @@ watch(() => authStore.token, (newToken) => {
 }
 
 .notif-item.unread {
-  border-left: 3px solid var(--primary-color);
+  border-left: 3px solid var(--accent-primary);
   background: rgba(255,77,0, 0.1);
 }
 </style>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useAppStore } from '../stores/app'
-import axios from 'axios'
+import api from '../services/api'
 import { useToast } from 'vue-toastification'
 
 import { useAuthStore } from '../stores/auth'
@@ -17,7 +17,7 @@ const loading = ref(false)
 
 const fetchCities = async () => {
   try {
-    const response = await axios.get('http://localhost:8081/api/location/cities')
+    const response = await api.get('/location/cities')
     cities.value = response.data
   } catch (err) {
     console.error('Failed to fetch cities', err)
@@ -28,11 +28,11 @@ const fetchCities = async () => {
 const fetchFeed = async () => {
   loading.value = true
   try {
-    let url = `http://localhost:8081/api/rides/feed?season=${appStore.currentSeason === 'enduro' ? 0 : 1}`
+    let url = `/rides/feed?season=${appStore.currentSeason === 'enduro' ? 0 : 1}`
     if (selectedCityId.value) {
       url += `&cityId=${selectedCityId.value}`
     }
-    const response = await axios.get(url)
+    const response = await api.get(url)
     rides.value = response.data
   } catch (err) {
     console.error('Failed to fetch feed', err)
@@ -48,7 +48,7 @@ const joinRide = async (ride: any) => {
     return
   }
   try {
-    await axios.post(`http://localhost:8081/api/rides/${ride.id}/join`, {}, {
+    await api.post(`/rides/${ride.id}/join`, {}, {
       headers: { 'Authorization': `Bearer ${authStore.token}` }
     })
     toast.success("Вы успешно присоединились к покатушке!")

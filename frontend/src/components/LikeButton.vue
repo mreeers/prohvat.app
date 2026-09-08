@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import api from '../services/api'
 import { useAuthStore } from '../stores/auth'
 
 const props = defineProps<{
@@ -15,7 +15,7 @@ const isLoading = ref(false)
 
 const fetchLikes = async () => {
   try {
-    const res = await axios.get(`http://localhost:8081/api/interactions/likes/${props.targetType}/${props.targetId}`)
+    const res = await api.get(`/interactions/likes/${props.targetType}/${props.targetId}`)
     likesCount.value = res.data.count
   } catch (e) {
     console.error("Failed to fetch likes", e)
@@ -28,7 +28,7 @@ const toggleLike = async () => {
   isLoading.value = true
   try {
     // Optimistic UI update could be added here, but let's do it safely for now
-    const res = await axios.post('http://localhost:8081/api/interactions/likes/toggle', {
+    const res = await api.post('/interactions/likes/toggle', {
       targetId: props.targetId,
       targetType: props.targetType
     }, {

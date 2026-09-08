@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import axios from 'axios'
+import api from '../services/api'
 
 // Decode JWT payload (base64url)
 function decodeJwt(token: string): any {
@@ -32,7 +32,7 @@ export const useAuthStore = defineStore('auth', () => {
         userId: payload['sub'] || ''
       }
     }
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
+    api.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
   }
 
   const isAuthenticated = () => !!token.value
@@ -40,7 +40,7 @@ export const useAuthStore = defineStore('auth', () => {
   const setToken = (newToken: string) => {
     token.value = newToken
     localStorage.setItem('jwt_token', newToken)
-    axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
+    api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
 
     // Decode and set user info
     const payload = decodeJwt(newToken)
@@ -56,7 +56,7 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null
     user.value = null
     localStorage.removeItem('jwt_token')
-    delete axios.defaults.headers.common['Authorization']
+    delete api.defaults.headers.common['Authorization']
   }
 
   return { token, user, isAuthenticated, setToken, logout }

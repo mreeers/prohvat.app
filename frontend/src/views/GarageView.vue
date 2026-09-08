@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import api from '../services/api'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
@@ -11,7 +11,7 @@ const loading = ref(true)
 
 const fetchVehicles = async () => {
   try {
-    const response = await axios.get('http://localhost:8081/api/vehicles/my', {
+    const response = await api.get('/vehicles/my', {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }

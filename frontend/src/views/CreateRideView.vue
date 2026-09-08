@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-import axios from 'axios'
+import api from '../services/api'
 import { useToast } from 'vue-toastification'
 
 const router = useRouter()
@@ -39,8 +39,8 @@ const setDefaultDate = () => {
 const fetchMetadata = async () => {
   try {
     const [catRes, cityRes] = await Promise.all([
-      axios.get('http://localhost:8081/api/vehicles/categories'),
-      axios.get('http://localhost:8081/api/location/cities')
+      api.get('/vehicles/categories'),
+      api.get('/location/cities')
     ])
     categories.value = catRes.data
     cities.value = cityRes.data
@@ -126,7 +126,7 @@ const submitRide = async () => {
       maxMembers: maxMembers.value
     }
     
-    await axios.post('http://localhost:8081/api/rides', payload, {
+    await api.post('/rides', payload, {
       headers: { 'Authorization': `Bearer ${authStore.token}` }
     })
     

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import api from '../services/api'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
@@ -18,7 +18,7 @@ const selectedFile = ref<File | null>(null)
 
 onMounted(async () => {
   try {
-    const res = await axios.get('http://localhost:8081/api/vehicles/categories')
+    const res = await api.get('/vehicles/categories')
     categories.value = res.data
     if(categories.value.length > 0) categoryId.value = categories.value[0].id
   } catch (err) {
@@ -47,7 +47,7 @@ const submit = async () => {
       formData.append('image', selectedFile.value)
     }
 
-    await axios.post('http://localhost:8081/api/vehicles', formData, {
+    await api.post('/vehicles', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         'Authorization': `Bearer ${authStore.token}`

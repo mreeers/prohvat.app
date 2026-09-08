@@ -19,7 +19,7 @@ class SignalRService {
     }
 
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:8081/hubs/prohvat', {
+      .withUrl('/hubs/prohvat', {
         accessTokenFactory: () => token
       })
       .withAutomaticReconnect()

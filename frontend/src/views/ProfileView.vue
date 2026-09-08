@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import axios from 'axios'
+import api from '../services/api'
 import { useAuthStore } from '../stores/auth'
 import { useToast } from "vue-toastification"
 
@@ -38,7 +38,7 @@ const searchCities = () => {
   clearTimeout(citySearchTimeout.value)
   if (searchCityTerm.value.length < 2) { cities.value = []; return }
   citySearchTimeout.value = setTimeout(async () => {
-    const res = await axios.get(`http://localhost:8081/api/location/cities?search=${searchCityTerm.value}`)
+    const res = await api.get(`/location/cities?search=${searchCityTerm.value}`)
     cities.value = res.data
   }, 300)
 }
@@ -58,7 +58,7 @@ const clearCity = () => {
 const fetchProfile = async () => {
   loading.value = true
   try {
-    const res = await axios.get(`http://localhost:8081/api/profile/${usernameParam}`)
+    const res = await api.get(`/profile/${usernameParam}`)
     profile.value = res.data
     isOwner.value = authStore.isAuthenticated() && authStore.user?.username === usernameParam
     editUsername.value = profile.value.username
@@ -69,13 +69,16 @@ const fetchProfile = async () => {
     
     // Fetch friends
     try {
-      const friendsRes = await axios.get(`http://localhost:8081/api/profile/${profile.value.id}/friends`)
+      const friendsRes = await api.get(`/profile/${profile.value.id}/friends`)
       friends.value = friendsRes.data
       
-      // Check if current user is friend
+      // Check if current user is friend or pending
       if (authStore.isAuthenticated() && authStore.user) {
         const friendMatch = friends.value.find(f => f.id === authStore.user!.userId)
-        if (friendMatch) isFriend.value = true
+        if (friendMatch) {
+          if (friendMatch.status === 1) isFriend.value = true;
+          else if (friendMatch.status === 0) isPendingFriend.value = true;
+        }
       }
     } catch (e) {
       console.error('Failed to fetch friends')
@@ -100,11 +103,11 @@ const saveProfile = async () => {
       formData.append('avatarFile', selectedAvatarFile.value)
     }
 
-    await axios.put(`http://localhost:8081/api/profile`, formData, {
+    await api.put(`/profile`, formData, {
       headers: { 'Authorization': `Bearer ${authStore.token}`, 'Content-Type': 'multipart/form-data' }
     })
     
-    await axios.put(`http://localhost:8081/api/profile/visibility`, {
+    await api.put(`/profile/visibility`, {
       isVisible: editIsVisibleOnMap.value
     }, {
       headers: { 'Authorization': `Bearer ${authStore.token}` }
@@ -152,7 +155,7 @@ const myRides = ref<any[]>([]);
 const inviteToRide = async () => {
   if (!profile.value) return;
   try {
-    const res = await axios.get('http://localhost:8081/api/rides/my', {
+    const res = await api.get('/rides/my', {
       headers: { 'Authorization': `Bearer ${authStore.token}` }
     });
     myRides.value = res.data;
@@ -164,7 +167,7 @@ const inviteToRide = async () => {
 
 const sendInvite = async (rideId: string) => {
   try {
-    await axios.post('http://localhost:8081/api/rideinvites', {
+    await api.post('/rideinvites', {
       rideId,
       inviteeId: profile.value.id
     }, {
@@ -196,6 +199,7 @@ const blockUser = async () => {
 }
 
 const isFriend = ref(false)
+const isPendingFriend = ref(false)
 
 const addFriend = async () => {
   if (!authStore.isAuthenticated()) {
@@ -203,13 +207,27 @@ const addFriend = async () => {
     return
   }
   try {
-    await axios.post(`http://localhost:8081/api/profile/friends/${profile.value.id}`, {}, {
+    await api.post(`/profile/friends/${profile.value.id}`, {}, {
       headers: { 'Authorization': `Bearer ${authStore.token}` }
     })
     toast.success("Заявка в друзья отправлена!")
-    isFriend.value = true // Temporary UI state
+    isPendingFriend.value = true
   } catch (err: any) {
     toast.error(err.response?.data?.Error || "Ошибка при добавлении в друзья.")
+  }
+}
+
+const removeFriend = async () => {
+  if (!confirm('Отменить заявку / удалить из друзей?')) return;
+  try {
+    await api.delete(`/profile/friends/${profile.value.id}`, {
+      headers: { 'Authorization': `Bearer ${authStore.token}` }
+    })
+    toast.success("Удалено из друзей.")
+    isFriend.value = false;
+    isPendingFriend.value = false;
+  } catch (err: any) {
+    toast.error("Ошибка при удалении.")
   }
 }
 
@@ -230,7 +248,7 @@ onMounted(() => {
     <div class="glass-panel profile-header">
       <div class="avatar-section">
         <div class="avatar-wrapper">
-          <img v-if="profile.avatarUrl" :src="profile.avatarUrl.startsWith('http') ? profile.avatarUrl : 'http://localhost:8081' + profile.avatarUrl" alt="Avatar" class="avatar" />
+          <img v-if="profile.avatarUrl" :src="profile.avatarUrl.startsWith('http') ? profile.avatarUrl : '/s3' + profile.avatarUrl" alt="Avatar" class="avatar" />
           <div v-else class="avatar-placeholder">{{ profile.name?.charAt(0) || '?' }}</div>
           <label v-if="isEditing" class="avatar-edit-btn" title="Изменить фото">
             📷
@@ -265,8 +283,9 @@ onMounted(() => {
             <button v-if="isOwner" @click="isEditing = true" class="btn-edit">✏️ Редактировать профиль</button>
             <template v-else-if="authStore.isAuthenticated()">
               <button @click="startDirectMessage" class="btn-primary">💬 Написать</button>
-              <button v-if="!isFriend" @click="addFriend" class="btn-secondary">➕ В друзья</button>
-              <button v-else class="btn-secondary" disabled>🤝 Вы друзья</button>
+              <button v-if="!isFriend && !isPendingFriend" @click="addFriend" class="btn-secondary">➕ В друзья</button>
+              <button v-else-if="isPendingFriend" @click="removeFriend" class="btn-secondary" style="color: #ff9800; border-color: #ff9800;">⏳ Заявка отправлена</button>
+              <button v-else @click="removeFriend" class="btn-secondary" style="color: #f44336; border-color: #f44336;">❌ Удалить из друзей</button>
               <button @click="inviteToRide" class="btn-secondary">📅 Пригласить</button>
               <button @click="blockUser" class="btn-danger-outline" style="margin-left:auto" title="Заблокировать">🚫</button>
             </template>

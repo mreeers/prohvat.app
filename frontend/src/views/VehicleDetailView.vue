@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import axios from 'axios'
+import api from '../services/api'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import LikeButton from '../components/LikeButton.vue'
@@ -33,7 +33,7 @@ const fetchVehicle = async () => {
   loading.value = true
   loadError.value = ''
   try {
-    const res = await axios.get(`http://localhost:8081/api/vehicles/${vehicleId}`)
+    const res = await api.get(`/vehicles/${vehicleId}`)
     vehicle.value = res.data
     logMetrics.value = res.data.currentMetricsValue
   } catch (err) {
@@ -59,7 +59,7 @@ const submitLog = async () => {
     formData.append('metricsValue', logMetrics.value.toString())
     selectedFiles.value.forEach(file => formData.append('images', file))
 
-    await axios.post(`http://localhost:8081/api/vehicles/${vehicleId}/logs`, formData, {
+    await api.post(`/vehicles/${vehicleId}/logs`, formData, {
       headers: { 'Content-Type': 'multipart/form-data', 'Authorization': `Bearer ${authStore.token}` }
     })
 
@@ -98,7 +98,7 @@ onMounted(fetchVehicle)
       <!-- Vehicle Header -->
       <div class="glass-panel vehicle-header">
         <div class="vehicle-image-col">
-          <img v-if="vehicle.imageUrl" :src="'http://localhost:8081' + vehicle.imageUrl" :alt="`${vehicle.brand} ${vehicle.model}`" class="vehicle-img" />
+          <img v-if="vehicle.imageUrl" :src="'/s3' + vehicle.imageUrl" :alt="`${vehicle.brand} ${vehicle.model}`" class="vehicle-img" />
           <div v-else class="vehicle-img-placeholder">🏍️</div>
         </div>
         <div class="vehicle-info-col">
@@ -177,7 +177,7 @@ onMounted(fetchVehicle)
             <div v-if="log.imageUrls && log.imageUrls.length > 0" class="log-images">
               <img
                 v-for="(url, i) in log.imageUrls" :key="i"
-                :src="url.startsWith('http') ? url : 'http://localhost:8081' + url"
+                :src="url.startsWith('http') ? url : '/s3' + url"
                 :alt="'Фото ' + (Number(i)+1)"
                 class="log-img"
               />

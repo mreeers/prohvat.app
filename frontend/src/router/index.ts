@@ -63,6 +63,33 @@ const router = createRouter({
       component: () => import('../views/ProfileView.vue')
     },
     {
+      path: '/friends',
+      name: 'friends',
+      component: () => import('../views/FriendsView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/map/users',
+      name: 'map-users',
+      component: HomeView
+    },
+    {
+      path: '/map/spots',
+      name: 'map-spots',
+      component: HomeView
+    },
+    {
+      path: '/videos',
+      name: 'videos',
+      component: () => import('../views/VideosView.vue')
+    },
+    {
+      path: '/settings',
+      name: 'settings',
+      component: () => import('../views/SettingsView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/messages',
       name: 'messages',
       component: () => import('../views/MessagesView.vue'),

@@ -22,6 +22,7 @@ services:
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=prohvat_db;Username=prohvat_user;Password=prohvat_password;
       - ASPNETCORE_ENVIRONMENT=Development
       - S3Storage__Endpoint=http://minio:9000
+      - S3Storage__PublicEndpoint=/s3
       - Redis__ConnectionString=redis:6379
       - RabbitMQ__Host=rabbitmq
       - MongoDB__ConnectionString=mongodb://mongo:27017

@@ -90,6 +90,16 @@ public class ProfileController : ControllerBase
         return Ok(new { success });
     }
 
+    [HttpDelete("friends/{addresseeId}")]
+    public async Task<IActionResult> RemoveFriend(Guid addresseeId)
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdStr, out var userId)) return Unauthorized();
+
+        var success = await _mediator.Send(new ProhvatApp.Application.Interactions.Commands.RemoveFriend.RemoveFriendCommand(userId, addresseeId));
+        return Ok(new { success });
+    }
+
     [HttpGet("{id}/friends")]
     [AllowAnonymous]
     public async Task<IActionResult> GetFriends(Guid id)

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "TLUlIU6+qvE=",
+  "dgSpecHash": "NHWbzTNCbjQ=",
   "success": true,
-  "projectFilePath": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Application.Tests\\ProhvatApp.Application.Tests.csproj",
+  "projectFilePath": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Application.Tests\\ProhvatApp.Application.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\verpl\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\verpl\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",

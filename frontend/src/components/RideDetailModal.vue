@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import axios from 'axios'
+import api from '../services/api'
 import { useAuthStore } from '../stores/auth'
 import CommentSection from './CommentSection.vue'
 
@@ -31,13 +31,13 @@ const isOrganizer = computed(() => authStore.user && authStore.user.userId === p
 const fetchRideData = async () => {
   // Assuming we don't have a GET /rides/{id} endpoint specifically, we can fetch reviews
   try {
-    const res = await axios.get(`http://localhost:8081/api/social/reviews/${props.ride.id}`, {
+    const res = await api.get(`/social/reviews/${props.ride.id}`, {
       headers: { 'Authorization': `Bearer ${authStore.token}` }
     })
     reviews.value = res.data
 
     if (authStore.isAuthenticated()) {
-      const memRes = await axios.get(`http://localhost:8081/api/rides/${props.ride.id}/membership`, {
+      const memRes = await api.get(`/rides/${props.ride.id}/membership`, {
         headers: { 'Authorization': `Bearer ${authStore.token}` }
       })
       isMember.value = memRes.data.isMember
@@ -48,12 +48,12 @@ const fetchRideData = async () => {
     }
     
     // Fetch members
-    const memListRes = await axios.get(`http://localhost:8081/api/rides/${props.ride.id}/members`)
+    const memListRes = await api.get(`/rides/${props.ride.id}/members`)
     members.value = memListRes.data
 
     // Fetch friends if logged in
     if (authStore.isAuthenticated() && authStore.user) {
-      const friendsRes = await axios.get(`http://localhost:8081/api/profile/${authStore.user.userId}/friends`)
+      const friendsRes = await api.get(`/profile/${authStore.user.userId}/friends`)
       myFriends.value = friendsRes.data.filter((f: any) => f.status === 1) // only accepted friends
     }
 
@@ -64,7 +64,7 @@ const fetchRideData = async () => {
 
 const fetchInvites = async () => {
   try {
-    const res = await axios.get(`http://localhost:8081/api/rideinvites/ride/${props.ride.id}`, {
+    const res = await api.get(`/rideinvites/ride/${props.ride.id}`, {
       headers: { 'Authorization': `Bearer ${authStore.token}` }
     })
     invites.value = res.data
@@ -85,12 +85,12 @@ const sendInvite = async () => {
   try {
     if (!inviteeId && targetUsername) {
       // Find user by username
-      const profileRes = await axios.get(`http://localhost:8081/api/profile/${targetUsername.replace('@', '')}`);
+      const profileRes = await api.get(`/profile/${targetUsername.replace('@', '')}`);
       inviteeId = profileRes.data.id;
     }
 
     // Send invite
-    await axios.post('http://localhost:8081/api/rideinvites', {
+    await api.post('/rideinvites', {
       rideId: props.ride.id,
       inviteeId: inviteeId
     }, {
@@ -112,7 +112,7 @@ const sendInvite = async () => {
 
 const postReview = async () => {
   try {
-    await axios.post('http://localhost:8081/api/social/reviews', {
+    await api.post('/social/reviews', {
       rideId: props.ride.id,
       rating: newReviewRating.value,
       text: newReviewText.value
@@ -132,7 +132,7 @@ const joinRide = async () => {
     return
   }
   try {
-    await axios.post(`http://localhost:8081/api/rides/${props.ride.id}/join`, {}, {
+    await api.post(`/rides/${props.ride.id}/join`, {}, {
       headers: { 'Authorization': `Bearer ${authStore.token}` }
     })
     isMember.value = true
@@ -145,7 +145,7 @@ const joinRide = async () => {
 
 const updateStatus = async () => {
   try {
-    await axios.put(`http://localhost:8081/api/rides/${props.ride.id}/status`, {
+    await api.put(`/rides/${props.ride.id}/status`, {
       status: newStatus.value,
       report: newReport.value
     }, {

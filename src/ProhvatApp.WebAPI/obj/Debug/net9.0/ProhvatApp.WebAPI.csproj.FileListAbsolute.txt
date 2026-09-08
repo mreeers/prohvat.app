@@ -174,3 +174,4 @@ C:\Repos\prohvat.app\src\ProhvatApp.WebAPI\bin\Debug\net9.0\ZstdSharp.dll
 c:\Repos\prohvat.app\src\ProhvatApp.WebAPI\bin\Debug\net9.0\FluentValidation.dll
 c:\Repos\prohvat.app\src\ProhvatApp.WebAPI\bin\Debug\net9.0\FluentValidation.DependencyInjectionExtensions.dll
 C:\Repos\prohvat.app\src\ProhvatApp.WebAPI\obj\Debug\net9.0\ProhvatApp.WebAPI.sourcelink.json
+C:\Repos\prohvat.app\src\ProhvatApp.WebAPI\obj\Debug\net9.0\swae.build.ex.cache

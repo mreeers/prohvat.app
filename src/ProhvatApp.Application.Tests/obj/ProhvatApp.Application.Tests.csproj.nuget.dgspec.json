@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Application.Tests\\ProhvatApp.Application.Tests.csproj": {}
+    "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Application.Tests\\ProhvatApp.Application.Tests.csproj": {}
   },
   "projects": {
-    "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Application.Tests\\ProhvatApp.Application.Tests.csproj": {
+    "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Application.Tests\\ProhvatApp.Application.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Application.Tests\\ProhvatApp.Application.Tests.csproj",
+        "projectUniqueName": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Application.Tests\\ProhvatApp.Application.Tests.csproj",
         "projectName": "ProhvatApp.Application.Tests",
-        "projectPath": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Application.Tests\\ProhvatApp.Application.Tests.csproj",
+        "projectPath": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Application.Tests\\ProhvatApp.Application.Tests.csproj",
         "packagesPath": "C:\\Users\\verpl\\.nuget\\packages\\",
-        "outputPath": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Application.Tests\\obj\\",
+        "outputPath": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Application.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -26,14 +26,16 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
+            "framework": "net9.0",
             "targetAlias": "net9.0",
             "projectReferences": {
-              "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Application\\ProhvatApp.Application.csproj": {
-                "projectPath": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Application\\ProhvatApp.Application.csproj"
+              "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Application\\ProhvatApp.Application.csproj": {
+                "projectPath": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Application\\ProhvatApp.Application.csproj"
               }
             }
           }
@@ -48,10 +50,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net9.0": {
+          "framework": "net9.0",
           "targetAlias": "net9.0",
           "dependencies": {
             "FluentAssertions": {
@@ -103,18 +106,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.315/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Application\\ProhvatApp.Application.csproj": {
+    "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Application\\ProhvatApp.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Application\\ProhvatApp.Application.csproj",
+        "projectUniqueName": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Application\\ProhvatApp.Application.csproj",
         "projectName": "ProhvatApp.Application",
-        "projectPath": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Application\\ProhvatApp.Application.csproj",
+        "projectPath": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Application\\ProhvatApp.Application.csproj",
         "packagesPath": "C:\\Users\\verpl\\.nuget\\packages\\",
-        "outputPath": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Application\\obj\\",
+        "outputPath": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -129,14 +132,16 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
+            "framework": "net9.0",
             "targetAlias": "net9.0",
             "projectReferences": {
-              "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj": {
-                "projectPath": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj"
+              "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj": {
+                "projectPath": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj"
               }
             }
           }
@@ -151,10 +156,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net9.0": {
+          "framework": "net9.0",
           "targetAlias": "net9.0",
           "dependencies": {
             "BCrypt.Net-Next": {
@@ -194,18 +200,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.315/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj": {
+    "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj",
+        "projectUniqueName": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj",
         "projectName": "ProhvatApp.Domain",
-        "projectPath": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj",
+        "projectPath": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\ProhvatApp.Domain.csproj",
         "packagesPath": "C:\\Users\\verpl\\.nuget\\packages\\",
-        "outputPath": "c:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\obj\\",
+        "outputPath": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -220,10 +226,12 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
+            "framework": "net9.0",
             "targetAlias": "net9.0",
             "projectReferences": {}
           }
@@ -238,10 +246,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net9.0": {
+          "framework": "net9.0",
           "targetAlias": "net9.0",
           "dependencies": {
             "NetTopologySuite": {
@@ -265,7 +274,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.315/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import axios from 'axios'
+import api from '../services/api'
 import { useAuthStore } from '../stores/auth'
 import { useToast } from "vue-toastification"
 
@@ -18,7 +18,7 @@ const newMarketplaceLink = ref('')
 
 onMounted(async () => {
   try {
-    const res = await axios.get('http://localhost:8081/api/vehicles/categories')
+    const res = await api.get('/vehicles/categories')
     categories.value = res.data
     if (categories.value.length > 0) {
       selectedCategoryId.value = categories.value[0].id
@@ -37,7 +37,7 @@ watch(selectedCategoryId, async (newVal) => {
 const fetchParts = async (categoryId: string) => {
   loading.value = true
   try {
-    const res = await axios.get(`http://localhost:8081/api/parts?categoryId=${categoryId}`)
+    const res = await api.get(`/parts?categoryId=${categoryId}`)
     parts.value = res.data
   } catch (err) {
     console.error("Failed to fetch parts", err)
@@ -53,7 +53,7 @@ const submitNewPart = async () => {
   }
 
   try {
-    await axios.post('http://localhost:8081/api/parts', {
+    await api.post('/parts', {
       vehicleCategoryId: selectedCategoryId.value,
       partName: newPartName.value,
       vendorCode: newVendorCode.value,

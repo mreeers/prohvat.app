@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from 'vue'
-import axios from 'axios'
+import api from '../services/api'
 import { useAuthStore } from '../stores/auth'
 
 const props = defineProps<{
@@ -55,8 +55,8 @@ const fetchEvents = async (bounds: number[][]) => {
     
     const seasonFilter = props.season === 'snowmobile' ? 2 : 1
     const [ridesRes, spotsRes] = await Promise.all([
-      axios.get(`http://localhost:8081/api/rides/bounds?minLat=${minLat}&minLng=${minLng}&maxLat=${maxLat}&maxLng=${maxLng}&season=${seasonFilter}`),
-      axios.get(`http://localhost:8081/api/spots/bounds?minLat=${minLat}&minLng=${minLng}&maxLat=${maxLat}&maxLng=${maxLng}&season=${seasonFilter}`)
+      api.get(`/rides/bounds?minLat=${minLat}&minLng=${minLng}&maxLat=${maxLat}&maxLng=${maxLng}&season=${seasonFilter}`),
+      api.get(`/spots/bounds?minLat=${minLat}&minLng=${minLng}&maxLat=${maxLat}&maxLng=${maxLng}&season=${seasonFilter}`)
     ])
     
     rides.value = ridesRes.data
@@ -69,7 +69,7 @@ const fetchEvents = async (bounds: number[][]) => {
 
 const fetchActiveRiders = async () => {
   try {
-    const res = await axios.get('http://localhost:8081/api/profile/active-riders')
+    const res = await api.get('/profile/active-riders')
     activeRiders.value = res.data
     updateMapMarkers()
   } catch (err) {
@@ -79,7 +79,7 @@ const fetchActiveRiders = async () => {
 
 const fetchCategories = async () => {
   try {
-    const res = await axios.get('http://localhost:8081/api/vehicles/categories')
+    const res = await api.get('/vehicles/categories')
     categories.value = res.data
     if (res.data.length > 0) newCategoryId.value = res.data[0].id
   } catch (err) {
@@ -93,7 +93,7 @@ const createEvent = async () => {
   
   try {
     if (createType.value === 'spot') {
-      await axios.post('http://localhost:8081/api/spots', {
+      await api.post('/spots', {
         title: newTitle.value,
         description: newDesc.value,
         complexity: newComplexity.value,
@@ -167,7 +167,7 @@ const updateMapMarkers = () => {
   activeRiders.value.forEach(rider => {
     const isStreet = rider.vehicleCategoryName === 'Дорожный мотоцикл'
     const ringColor = isStreet ? '#2196f3' : '#ff9800'
-    const avatar = rider.avatarUrl ? (rider.avatarUrl.startsWith('http') ? rider.avatarUrl : 'http://localhost:8081' + rider.avatarUrl) : 'https://ui-avatars.com/api/?name=' + rider.username
+    const avatar = rider.avatarUrl ? (rider.avatarUrl.startsWith('http') ? rider.avatarUrl : '/s3' + rider.avatarUrl) : 'https://ui-avatars.com/api/?name=' + rider.username
     const vehicleText = rider.vehicleName ? `<br>🏍️ ${rider.vehicleName}` : ''
 
     const placemark = new ymaps.Placemark([rider.latitude, rider.longitude], {
@@ -191,7 +191,7 @@ const initMap = async () => {
 
   if (authStore.isAuthenticated() && authStore.user?.username) {
     try {
-      const res = await axios.get(`http://localhost:8081/api/profile/${authStore.user.username}`)
+      const res = await api.get(`/profile/${authStore.user.username}`)
       if (res.data && res.data.cityLat) {
         centerLat = res.data.cityLat
         centerLng = res.data.cityLng
@@ -251,7 +251,7 @@ onMounted(() => {
       if (map) map.setCenter([currentLat, currentLng])
 
       try {
-        await axios.put('http://localhost:8081/api/profile/location', {
+        await api.put('/profile/location', {
           latitude: currentLat,
           longitude: currentLng
         }, {
@@ -266,7 +266,7 @@ onMounted(() => {
     setInterval(() => {
       navigator.geolocation.getCurrentPosition(async (position) => {
         try {
-          await axios.put('http://localhost:8081/api/profile/location', {
+          await api.put('/profile/location', {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
           }, {
@@ -299,7 +299,7 @@ const sendSos = async () => {
 
   navigator.geolocation.getCurrentPosition(async (position) => {
     try {
-      await axios.post('http://localhost:8081/api/sos', {
+      await api.post('/sos', {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
         message: "Мне нужна помощь!"

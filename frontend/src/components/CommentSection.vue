@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import api from '../services/api'
 import { useAuthStore } from '../stores/auth'
 
 const props = defineProps<{
@@ -14,7 +14,7 @@ const authStore = useAuthStore()
 
 const fetchComments = async () => {
   try {
-    const res = await axios.get(`http://localhost:8081/api/interactions/comments/${props.targetType}/${props.targetId}`)
+    const res = await api.get(`/interactions/comments/${props.targetType}/${props.targetId}`)
     comments.value = res.data
   } catch (e) {
     console.error("Failed to load comments", e)
@@ -24,7 +24,7 @@ const fetchComments = async () => {
 const postComment = async () => {
   if (!newComment.value.trim()) return
   try {
-    await axios.post('http://localhost:8081/api/interactions/comments', {
+    await api.post('/interactions/comments', {
       targetId: props.targetId,
       targetType: props.targetType,
       text: newComment.value

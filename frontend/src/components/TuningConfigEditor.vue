@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import api from '../services/api'
 import { useAuthStore } from '../stores/auth'
 
 const props = defineProps<{
@@ -47,7 +47,7 @@ const saveConfig = async () => {
     
     const jsonString = JSON.stringify(configObj)
     
-    await axios.put(`http://localhost:8081/api/vehicles/${props.vehicleId}/config`, {
+    await api.put(`/vehicles/${props.vehicleId}/config`, {
       technicalConfigJson: jsonString
     }, {
       headers: { 'Authorization': `Bearer ${authStore.token}` }
