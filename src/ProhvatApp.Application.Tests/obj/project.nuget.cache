@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "NHWbzTNCbjQ=",
+  "dgSpecHash": "ISf+KQTeLEk=",
   "success": true,
   "projectFilePath": "C:\\Repos\\prohvat.app\\src\\ProhvatApp.Application.Tests\\ProhvatApp.Application.Tests.csproj",
   "expectedPackageFiles": [
@@ -10,7 +10,7 @@
     "C:\\Users\\verpl\\.nuget\\packages\\fluentassertions\\8.10.0\\fluentassertions.8.10.0.nupkg.sha512",
     "C:\\Users\\verpl\\.nuget\\packages\\fluentvalidation\\12.1.1\\fluentvalidation.12.1.1.nupkg.sha512",
     "C:\\Users\\verpl\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\12.1.1\\fluentvalidation.dependencyinjectionextensions.12.1.1.nupkg.sha512",
-    "C:\\Users\\verpl\\.nuget\\packages\\masstransit.abstractions\\9.1.2\\masstransit.abstractions.9.1.2.nupkg.sha512",
+    "C:\\Users\\verpl\\.nuget\\packages\\masstransit.abstractions\\8.3.6\\masstransit.abstractions.8.3.6.nupkg.sha512",
     "C:\\Users\\verpl\\.nuget\\packages\\mediatr\\14.1.0\\mediatr.14.1.0.nupkg.sha512",
     "C:\\Users\\verpl\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
     "C:\\Users\\verpl\\.nuget\\packages\\microsoft.codecoverage\\17.12.0\\microsoft.codecoverage.17.12.0.nupkg.sha512",

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProhvatApp.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+09607b1478614b120861bd5c1b3695ef687a6154")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fc079b3bb43e38d5be36d794b3477ffd66daa7b2")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProhvatApp.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProhvatApp.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

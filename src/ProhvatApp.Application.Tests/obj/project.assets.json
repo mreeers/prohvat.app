@@ -76,7 +76,7 @@
           }
         }
       },
-      "MassTransit.Abstractions/9.1.2": {
+      "MassTransit.Abstractions/8.3.6": {
         "type": "package",
         "compile": {
           "lib/net9.0/MassTransit.Abstractions.dll": {
@@ -887,7 +887,7 @@
         "dependencies": {
           "BCrypt.Net-Next": "4.2.0",
           "FluentValidation.DependencyInjectionExtensions": "12.1.1",
-          "MassTransit.Abstractions": "9.1.2",
+          "MassTransit.Abstractions": "8.3.6",
           "MediatR": "14.1.0",
           "Microsoft.EntityFrameworkCore": "9.0.2",
           "ProhvatApp.Domain": "1.0.0"
@@ -1089,16 +1089,14 @@
         "lib/net8.0/FluentValidation.DependencyInjectionExtensions.xml"
       ]
     },
-    "MassTransit.Abstractions/9.1.2": {
-      "sha512": "o2MymiTaxaJ0LUNm6W/8taD1u6Q/hyee1FwM/XvJ8l4IHgGBOVllPLuViYiI/XDu/t86ErjXOJqXrkOB/+ZrCg==",
+    "MassTransit.Abstractions/8.3.6": {
+      "sha512": "F3R3EFPvUvpsiebnijmpvZ4IhSEcqkEJdrhlFuTOjzIUnMRYBgki/oDfFWj57Ki4b9yq0nilt4Q5bk11pC4ygg==",
       "type": "package",
-      "path": "masstransit.abstractions/9.1.2",
+      "path": "masstransit.abstractions/8.3.6",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "NuGet.README.md",
-        "lib/net10.0/MassTransit.Abstractions.dll",
-        "lib/net10.0/MassTransit.Abstractions.xml",
         "lib/net472/MassTransit.Abstractions.dll",
         "lib/net472/MassTransit.Abstractions.xml",
         "lib/net8.0/MassTransit.Abstractions.dll",
@@ -1107,7 +1105,7 @@
         "lib/net9.0/MassTransit.Abstractions.xml",
         "lib/netstandard2.0/MassTransit.Abstractions.dll",
         "lib/netstandard2.0/MassTransit.Abstractions.xml",
-        "masstransit.abstractions.9.1.2.nupkg.sha512",
+        "masstransit.abstractions.8.3.6.nupkg.sha512",
         "masstransit.abstractions.nuspec",
         "mt-logo-small.png"
       ]
