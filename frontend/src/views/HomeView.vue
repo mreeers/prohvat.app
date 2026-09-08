@@ -28,8 +28,9 @@ const appStore = useAppStore()
 <style scoped>
 .home-view {
   position: relative;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: calc(100vh - 56px);
+  margin-top: -16px; /* Offset the 16px page-layout gap if needed, or we just rely on App.vue overrides */
 }
 
 .floating-controls {

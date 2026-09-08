@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
 import { useAuthStore } from './stores/auth'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import api from './services/api'
 import { signalRService } from './services/signalr'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
+
+const isMapRoute = computed(() => {
+  return ['home', 'map-users', 'map-spots'].includes(route.name as string)
+})
 
 const showNotifications = ref(false)
 const notifications = ref<any[]>([])
@@ -112,7 +117,7 @@ watch(() => authStore.token, (newToken) => {
     </header>
 
     <!-- Main Page Layout -->
-    <div class="page-layout">
+    <div :class="['page-layout', { 'full-width': isMapRoute }]">
       <!-- Left Sidebar (VK Style) -->
       <aside class="sidebar" v-if="authStore.isAuthenticated()">
         <nav class="sidebar-nav">
@@ -125,7 +130,7 @@ watch(() => authStore.token, (newToken) => {
           <router-link to="/friends" class="sidebar-link">
             <span class="icon">👥</span> Мои друзья
           </router-link>
-          <router-link to="/map/users" class="sidebar-link">
+          <router-link to="/map/users" class="sidebar-link" :class="{ 'router-link-active': route.path === '/' }">
             <span class="icon">🗺️</span> Карта райдеров
           </router-link>
           <router-link to="/map/spots" class="sidebar-link">
@@ -209,12 +214,27 @@ watch(() => authStore.token, (newToken) => {
   padding: 0 16px;
   width: 100%;
   gap: 24px;
+  transition: all 0.3s ease;
+}
+
+.page-layout.full-width {
+  max-width: 100%;
+  margin-top: 56px; /* No gap */
+  padding: 0;
+  gap: 0;
+}
+
+.page-layout.full-width .content {
+  padding-bottom: 0;
 }
 
 /* Sidebar */
 .sidebar {
   width: 220px;
   flex-shrink: 0;
+}
+.page-layout.full-width .sidebar {
+  padding: 16px 0 0 16px;
 }
 
 .sidebar-nav {
