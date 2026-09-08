@@ -8,7 +8,10 @@ echo "=========================================="
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-if [ -d .git ]; then
+if [ -d /home/alex/prohvat.git ]; then
+    echo "📥 Updating from local git bare repo..."
+    git --git-dir=/home/alex/prohvat.git checkout -f main || true
+elif [ -d .git ]; then
     echo "📥 Pulling latest git commits..."
     git pull origin main || true
 fi
