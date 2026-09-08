@@ -94,13 +94,13 @@ public class GetFeedQueryHandler : IRequestHandler<GetFeedQuery, List<FeedItemDt
             .Take(50)
             .ToListAsync(cancellationToken);
 
-        // 4. Fetch PartReviews linked to logs
-        var logIds = validLogs.Select(l => l.Id).ToList();
+        // 4. Fetch PartReviews for these vehicle categories
+        var categoryIds = vehicles.Select(v => v.CategoryId).Distinct().ToList();
         var partReviews = await _context.PartReviews
             .AsNoTracking()
-            .Where(p => p.LogId.HasValue && logIds.Contains(p.LogId.Value))
+            .Where(p => categoryIds.Contains(p.VehicleCategoryId))
             .ToListAsync(cancellationToken);
-        var partReviewLookup = partReviews.ToLookup(p => p.LogId!.Value);
+        var partReviewLookup = partReviews.ToLookup(p => p.VehicleCategoryId);
 
         // 5. Interactions: Likes & Comments
         var targetIds = validLogs.Select(l => l.Id).Concat(rides.Select(r => r.Id)).ToList();
@@ -164,7 +164,7 @@ public class GetFeedQueryHandler : IRequestHandler<GetFeedQuery, List<FeedItemDt
                 MetricUnit = vehicle.OdometerType == OdometerType.MotoHours ? "м/ч" : "км",
                 CategoryName = vehicle.Category?.Name,
                 Season = vehicle.Category?.Season,
-                PartReviews = partReviewLookup[log.Id].Select(pr => new FeedPartReviewDto
+                PartReviews = partReviewLookup[vehicle.CategoryId].Select(pr => new FeedPartReviewDto
                 {
                     Id = pr.Id,
                     PartName = pr.PartName,

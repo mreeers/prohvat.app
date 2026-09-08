@@ -390,7 +390,7 @@ public class DataSeederService : IHostedService
             VendorCode = "WR-JL-2105",
             MarketplaceLink = "https://clubturbo.ru",
             AuthorId = userAlex.Id,
-            LogId = Guid.Parse("10000000-0000-0000-0000-000000000002")
+            LogId = null
         };
 
         var pr2 = new PartReview
@@ -401,7 +401,7 @@ public class DataSeederService : IHostedService
             VendorCode = "ARMA-KTM-300",
             MarketplaceLink = "https://armamoto.ru",
             AuthorId = userAlex.Id,
-            LogId = Guid.Parse("10000000-0000-0000-0000-000000000001")
+            LogId = null
         };
 
         context.PartReviews.AddRange(pr1, pr2);
