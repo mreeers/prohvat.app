@@ -1,4 +1,7 @@
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using ProhvatApp.Domain.Entities;
 
@@ -7,6 +10,18 @@ namespace ProhvatApp.Infrastructure.Persistence.MongoDb;
 public class MongoDbContext
 {
     private readonly IMongoDatabase _database;
+
+    static MongoDbContext()
+    {
+        try
+        {
+            BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+        }
+        catch (BsonSerializationException)
+        {
+            // Already registered
+        }
+    }
 
     public MongoDbContext(IOptions<MongoDbSettings> settings)
     {

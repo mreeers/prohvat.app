@@ -156,7 +156,8 @@ public class DataSeederService : IHostedService
     {
         if (await context.Users.AnyAsync(u => u.Email == "alex@prohvat.app", cancellationToken))
         {
-            _logger.LogInformation("Demo users already exist. Skipping demo seeding.");
+            await EnsureMongoLogsSeededAsync(logRepo, cancellationToken);
+            _logger.LogInformation("Demo users already exist. Skipping Postgres demo seeding.");
             return;
         }
 
@@ -467,72 +468,7 @@ public class DataSeederService : IHostedService
         {
             try
             {
-                var logs = new List<VehicleLog>
-                {
-                    new VehicleLog
-                    {
-                        Id = logAlexKtmId,
-                        VehicleId = alexKtm.Id,
-                        Title = "Хард-эндуро прохват на Чертово Городище: камни, бревна и грязевой подъем",
-                        Content = "Отлично закатили на выходных! Собрались вчетвером у карьера и пошли через сосновый бор на скалы. Новая резина Mitas 754 гребет феноменально. На подъеме с бревнами пришлось попотеть — один раз положил мот на бок, но защита радиаторов отработала на все 100%!",
-                        MetricsValueAtLog = 42,
-                        CreatedAt = DateTime.UtcNow.AddHours(-3),
-                        LikeCount = 3,
-                        ImageUrls = new List<string>
-                        {
-                            "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800&auto=format&fit=crop&q=80",
-                            "https://images.unsplash.com/photo-1558980394-4c7c9299fe96?w=800&auto=format&fit=crop&q=80"
-                        },
-                        VideoUrls = new List<string> { "https://www.youtube.com/embed/ScMzIvxBSi4" }
-                    },
-                    new VehicleLog
-                    {
-                        Id = logDariaDriftId,
-                        VehicleId = dariaVaz.Id,
-                        Title = "Первый ледовый заезд на озере: парный дрифт удался!",
-                        Content = "Лед встал, толщина 25 см — открыли зимний сезон! Выворот We Ride показал себя отлично, машина ставится в глубокий угол и легко контролируется газом. Заварили редуктор на 4.1, теперь третья передача крутится намного бодрее.",
-                        MetricsValueAtLog = 92000,
-                        CreatedAt = DateTime.UtcNow.AddHours(-6),
-                        LikeCount = 2,
-                        ImageUrls = new List<string>
-                        {
-                            "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&auto=format&fit=crop&q=80",
-                            "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800&auto=format&fit=crop&q=80"
-                        },
-                        VideoUrls = new List<string>()
-                    },
-                    new VehicleLog
-                    {
-                        Id = logSergeySnowId,
-                        VehicleId = sergeySnow.Id,
-                        Title = "Свежий пухляк на Красной Поляне: открыли горный сезон 2026",
-                        Content = "Выпало почти 80 см свежего снега! Summit 850 в своей стихии: сайдхиллинг, прыжки с надувов и подъем по кулуарам. Температура -6°C, видимость отличная. Все системы работают штатно.",
-                        MetricsValueAtLog = 35,
-                        CreatedAt = DateTime.UtcNow.AddHours(-14),
-                        LikeCount = 1,
-                        ImageUrls = new List<string>
-                        {
-                            "https://images.unsplash.com/photo-1517055729445-fa7d27394b48?w=800&auto=format&fit=crop&q=80"
-                        },
-                        VideoUrls = new List<string>()
-                    },
-                    new VehicleLog
-                    {
-                        Id = Guid.Parse("10000000-0000-0000-0000-000000000004"),
-                        VehicleId = ivanMoto.Id,
-                        Title = "Обкатка новой Хаски: первые впечатления и замена масла на 15 м/ч",
-                        Content = "Сменил транспортировочное масло на Motorex Cross Power 2T. По подвеске WP XACT — пока самая мягкая и энергоемкая из всего, на чем доводилось катать. Поставил толстую камеру Michelin UHD 4mm назад, чтобы не бояться пробоев на острых камнях.",
-                        MetricsValueAtLog = 18,
-                        CreatedAt = DateTime.UtcNow.AddDays(-1),
-                        LikeCount = 0,
-                        ImageUrls = new List<string>
-                        {
-                            "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800&auto=format&fit=crop&q=80"
-                        },
-                        VideoUrls = new List<string>()
-                    }
-                };
-
+                var logs = GetDemoVehicleLogs();
                 foreach (var log in logs)
                 {
                     await logRepo.AddAsync(log, cancellationToken);
@@ -545,6 +481,97 @@ public class DataSeederService : IHostedService
         }
 
         _logger.LogInformation("Realistic demo riders and feed seeded successfully!");
+    }
+
+    private async Task EnsureMongoLogsSeededAsync(IVehicleLogRepository? logRepo, CancellationToken cancellationToken)
+    {
+        if (logRepo == null) return;
+        try
+        {
+            var existingLogs = await logRepo.GetRecentLogsAsync(null, 1, cancellationToken);
+            if (existingLogs != null && existingLogs.Any()) return;
+
+            _logger.LogInformation("Seeding Mongo vehicle logs for demo vehicles...");
+            var logs = GetDemoVehicleLogs();
+            foreach (var log in logs)
+            {
+                await logRepo.AddAsync(log, cancellationToken);
+            }
+            _logger.LogInformation("Mongo demo logs seeded successfully!");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning($"Could not seed Mongo logs in EnsureMongoLogsSeededAsync: {ex.Message}");
+        }
+    }
+
+    private static List<VehicleLog> GetDemoVehicleLogs()
+    {
+        return new List<VehicleLog>
+        {
+            new VehicleLog
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000001"),
+                VehicleId = Guid.Parse("aaaa0001-0000-0000-0000-000000000001"),
+                Title = "Хард-эндуро прохват на Чертово Городище: камни, бревна и грязевой подъем",
+                Content = "Отлично закатили на выходных! Собрались вчетвером у карьера и пошли через сосновый бор на скалы. Новая резина Mitas 754 гребет феноменально. На подъеме с бревнами пришлось попотеть — один раз положил мот на бок, но защита радиаторов отработала на все 100%!",
+                MetricsValueAtLog = 42,
+                CreatedAt = DateTime.UtcNow.AddHours(-3),
+                LikeCount = 3,
+                ImageUrls = new List<string>
+                {
+                    "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800&auto=format&fit=crop&q=80",
+                    "https://images.unsplash.com/photo-1558980394-4c7c9299fe96?w=800&auto=format&fit=crop&q=80"
+                },
+                VideoUrls = new List<string> { "https://www.youtube.com/embed/ScMzIvxBSi4" }
+            },
+            new VehicleLog
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000002"),
+                VehicleId = Guid.Parse("aaaa0002-0000-0000-0000-000000000002"),
+                Title = "Первый ледовый заезд на озере: парный дрифт удался!",
+                Content = "Лед встал, толщина 25 см — открыли зимний сезон! Выворот We Ride показал себя отлично, машина ставится в глубокий угол и легко контролируется газом. Заварили редуктор на 4.1, теперь третья передача крутится намного бодрее.",
+                MetricsValueAtLog = 92000,
+                CreatedAt = DateTime.UtcNow.AddHours(-6),
+                LikeCount = 2,
+                ImageUrls = new List<string>
+                {
+                    "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&auto=format&fit=crop&q=80",
+                    "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800&auto=format&fit=crop&q=80"
+                },
+                VideoUrls = new List<string>()
+            },
+            new VehicleLog
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000003"),
+                VehicleId = Guid.Parse("dddd0001-0000-0000-0000-000000000001"),
+                Title = "Свежий пухляк на Красной Поляне: открыли горный сезон 2026",
+                Content = "Выпало почти 80 см свежего снега! Summit 850 в своей стихии: сайдхиллинг, прыжки с надувов и подъем по кулуарам. Температура -6°C, видимость отличная. Все системы работают штатно.",
+                MetricsValueAtLog = 35,
+                CreatedAt = DateTime.UtcNow.AddHours(-14),
+                LikeCount = 1,
+                ImageUrls = new List<string>
+                {
+                    "https://images.unsplash.com/photo-1517055729445-fa7d27394b48?w=800&auto=format&fit=crop&q=80"
+                },
+                VideoUrls = new List<string>()
+            },
+            new VehicleLog
+            {
+                Id = Guid.Parse("10000000-0000-0000-0000-000000000004"),
+                VehicleId = Guid.Parse("cccc0001-0000-0000-0000-000000000001"),
+                Title = "Обкатка новой Хаски: первые впечатления и замена масла на 15 м/ч",
+                Content = "Сменил транспортировочное масло на Motorex Cross Power 2T. По подвеске WP XACT — пока самая мягкая и энергоемкая из всего, на чем доводилось катать. Поставил толстую камеру Michelin UHD 4mm назад, чтобы не бояться пробоев на острых камнях.",
+                MetricsValueAtLog = 18,
+                CreatedAt = DateTime.UtcNow.AddDays(-1),
+                LikeCount = 0,
+                ImageUrls = new List<string>
+                {
+                    "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800&auto=format&fit=crop&q=80"
+                },
+                VideoUrls = new List<string>()
+            }
+        };
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
