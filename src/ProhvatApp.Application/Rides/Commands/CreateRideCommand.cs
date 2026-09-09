@@ -21,7 +21,8 @@ public record CreateRideCommand(
     double Latitude,
     double Longitude,
     Guid? CityId,
-    int MaxMembers = 10) : IRequest<Guid>;
+    int MaxMembers = 10,
+    string? GpxTrackPath = null) : IRequest<Guid>;
 
 public class CreateRideCommandHandler : IRequestHandler<CreateRideCommand, Guid>
 {
@@ -50,7 +51,8 @@ public class CreateRideCommandHandler : IRequestHandler<CreateRideCommand, Guid>
             Type = RideType.Friendly, // For MVP, all are friendly
             MaxMembers = request.MaxMembers,
             StartPoint = point,
-            CityId = request.CityId
+            CityId = request.CityId,
+            GpxTrackPath = request.GpxTrackPath ?? string.Empty
         };
 
         _context.Rides.Add(ride);

@@ -10,7 +10,10 @@ using ProhvatApp.Application.Rides.Queries;
 using ProhvatApp.Application.Rides.Queries.GetMyRides;
 using ProhvatApp.Application.Rides.Queries.GetFeed;
 using ProhvatApp.Application.Rides.Queries.GetMembers;
+using ProhvatApp.Application.Rides.Commands.UploadRideGpx;
+using ProhvatApp.Application.Rides.Queries.GetRideById;
 using ProhvatApp.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace ProhvatApp.WebAPI.Controllers;
 
@@ -23,6 +26,22 @@ public class RidesController : ControllerBase
     public RidesController(IMediator mediator)
     {
         _mediator = mediator;
+    }
+
+    [HttpGet("{id}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetRide(Guid id)
+    {
+        Guid? currentUserId = null;
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (Guid.TryParse(userIdStr, out var parsedUserId))
+        {
+            currentUserId = parsedUserId;
+        }
+
+        var ride = await _mediator.Send(new GetRideByIdQuery(id, currentUserId));
+        if (ride == null) return NotFound();
+        return Ok(ride);
     }
 
     [HttpGet("bounds")]
@@ -66,11 +85,43 @@ public class RidesController : ControllerBase
             request.Latitude,
             request.Longitude,
             request.CityId,
-            request.MaxMembers
+            request.MaxMembers,
+            request.GpxTrackPath
         );
 
         var id = await _mediator.Send(command);
         return Ok(new { Id = id });
+    }
+
+    [Authorize]
+    [HttpPost("{id}/gpx")]
+    public async Task<IActionResult> UploadGpx(Guid id, IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest(new { Error = "No file provided" });
+        }
+
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        try
+        {
+            using var stream = file.OpenReadStream();
+            var command = new UploadRideGpxCommand(id, userId, stream, file.FileName, file.ContentType ?? "application/gpx+xml");
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
     }
 
     [Authorize]
@@ -148,4 +199,5 @@ public class CreateRideRequest
     public double Longitude { get; set; }
     public Guid? CityId { get; set; }
     public int MaxMembers { get; set; } = 10;
+    public string? GpxTrackPath { get; set; }
 }

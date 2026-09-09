@@ -29,4 +29,5 @@ public class User
     public List<UserBlock> BlockedByUsers { get; set; } = new();
     public List<RideInvite> SentInvites { get; set; } = new();
     public List<RideInvite> ReceivedInvites { get; set; } = new();
+    public List<UserAchievement> Achievements { get; set; } = new();
 }

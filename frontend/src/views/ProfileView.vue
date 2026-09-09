@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
 import { useAuthStore } from '../stores/auth'
@@ -28,8 +28,11 @@ const searchCityTerm = ref('')
 const selectedCityId = ref<string | null>(null)
 const citySearchTimeout = ref<any>(null)
 
-const activeTab = ref<'rides' | 'garage' | 'friends'>('rides')
+const activeTab = ref<'rides' | 'garage' | 'friends' | 'achievements'>('rides')
 const friends = ref<any[]>([])
+const achievements = ref<any[]>([])
+const earnedAchievementsCount = computed(() => achievements.value.filter(a => a.isEarned).length)
+const totalPoints = computed(() => achievements.value.filter(a => a.isEarned).reduce((sum, a) => sum + (a.points || 0), 0))
 
 const complexityLabels: Record<number, string> = { 1: 'Лёгкая', 2: 'Средняя', 3: 'Жёсткая', 4: 'Экстрим', 5: 'Дикий Запад' }
 const complexityColors: Record<number, string> = { 1: '#4caf50', 2: '#8bc34a', 3: '#ff9800', 4: '#ff5722', 5: '#f44336' }
@@ -82,6 +85,14 @@ const fetchProfile = async () => {
       }
     } catch (e) {
       console.error('Failed to fetch friends')
+    }
+
+    // Fetch achievements
+    try {
+      const achRes = await api.get(`/achievements/user/${usernameParam}`)
+      achievements.value = achRes.data || []
+    } catch (e) {
+      console.error('Failed to fetch achievements')
     }
   } catch (e) {
     console.error('Profile not found')
@@ -380,6 +391,9 @@ onMounted(() => {
       <button class="tab" :class="{ active: activeTab === 'friends' }" @click="activeTab = 'friends'">
         🤝 Друзья ({{ friends.length }})
       </button>
+      <button class="tab" :class="{ active: activeTab === 'achievements' }" @click="activeTab = 'achievements'">
+        🏆 Достижения ({{ earnedAchievementsCount }}/{{ achievements.length }})
+      </button>
     </div>
 
     <!-- Rides Tab -->
@@ -439,6 +453,58 @@ onMounted(() => {
           <div class="friend-status">
             <span v-if="f.status === 0" class="status-pending">Ожидает подтверждения</span>
             <span v-else-if="f.status === 1" class="status-accepted">✓ Друзья</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Achievements Tab -->
+    <div v-if="activeTab === 'achievements'" class="tab-content">
+      <div class="achievements-summary glass-panel">
+        <div class="ach-summary-text">
+          <h3>🎖️ Достижения и боевые награды</h3>
+          <p class="ach-subtitle">Разблокировано {{ earnedAchievementsCount }} из {{ achievements.length }} наград ({{ totalPoints }} XP)</p>
+        </div>
+        <div class="ach-progress-bar-wrap">
+          <div
+            class="ach-progress-fill"
+            :style="{ width: `${achievements.length > 0 ? (earnedAchievementsCount / achievements.length) * 100 : 0}%` }"
+          ></div>
+        </div>
+      </div>
+
+      <div v-if="achievements.length === 0" class="empty-state">
+        <div class="empty-icon">🏆</div>
+        <p>Награды еще загружаются...</p>
+      </div>
+
+      <div v-else class="achievements-grid">
+        <div
+          v-for="ach in achievements"
+          :key="ach.id"
+          class="glass-panel achievement-card"
+          :class="{ 'earned': ach.isEarned, 'locked': !ach.isEarned }"
+        >
+          <div class="ach-badge-icon">
+            <span class="icon-symbol">{{ ach.icon || '🏆' }}</span>
+            <span v-if="ach.isEarned" class="ach-check">✓</span>
+            <span v-else class="ach-lock">🔒</span>
+          </div>
+
+          <div class="ach-card-info">
+            <div class="ach-title-row">
+              <h4 class="ach-title">{{ ach.title }}</h4>
+              <span class="ach-points">+{{ ach.points }} XP</span>
+            </div>
+            <p class="ach-desc">{{ ach.description }}</p>
+            <div class="ach-footer">
+              <span v-if="ach.isEarned" class="ach-status-earned">
+                🎖️ Разблокировано {{ ach.earnedAt ? formatDate(ach.earnedAt) : '' }}
+              </span>
+              <span v-else class="ach-status-locked">
+                🔒 Заблокировано
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -774,4 +840,179 @@ onMounted(() => {
 }
 .status-pending { color: #ff9800; font-size: 0.9rem; }
 .status-accepted { color: #4caf50; font-weight: bold; }
+
+/* Achievements styles */
+.achievements-summary {
+  padding: 22px 26px;
+  border-radius: 16px;
+  background: rgba(26, 26, 36, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 22px;
+}
+.ach-summary-text h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #fff;
+}
+.ach-subtitle {
+  margin: 6px 0 16px;
+  color: #aaa;
+  font-size: 0.95rem;
+}
+.ach-progress-bar-wrap {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.ach-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff6b00 0%, #ffc107 100%);
+  border-radius: 20px;
+  transition: width 0.4s ease;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 16px;
+}
+
+.achievement-card {
+  display: flex;
+  gap: 18px;
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(26, 26, 36, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.25s ease;
+}
+
+.achievement-card.earned {
+  border-color: rgba(255, 193, 7, 0.35);
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.08) 0%, rgba(26, 26, 36, 0.7) 100%);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.achievement-card.earned:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 193, 7, 0.6);
+  box-shadow: 0 8px 24px rgba(255, 193, 7, 0.15);
+}
+
+.achievement-card.locked {
+  opacity: 0.55;
+  filter: grayscale(0.5);
+}
+
+.achievement-card.locked:hover {
+  opacity: 0.75;
+}
+
+.ach-badge-icon {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.achievement-card.earned .ach-badge-icon {
+  background: radial-gradient(circle, rgba(255, 193, 7, 0.25) 0%, rgba(255, 107, 0, 0.1) 100%);
+  border-color: rgba(255, 193, 7, 0.5);
+}
+
+.icon-symbol {
+  font-size: 2.2rem;
+}
+
+.ach-check {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: #4caf50;
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #1a1a24;
+}
+
+.ach-lock {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: #555;
+  color: #ccc;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #1a1a24;
+}
+
+.ach-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.ach-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ach-title {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.ach-points {
+  font-size: 0.82rem;
+  color: #ffc107;
+  font-weight: 700;
+  background: rgba(255, 193, 7, 0.15);
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.ach-desc {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #aaa;
+  line-height: 1.4;
+}
+
+.ach-footer {
+  margin-top: 4px;
+  font-size: 0.78rem;
+}
+
+.ach-status-earned {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.ach-status-locked {
+  color: #888;
+}
 </style>

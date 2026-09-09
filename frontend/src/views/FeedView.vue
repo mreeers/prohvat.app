@@ -3,9 +3,12 @@ import { ref, onMounted, watch } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useToast } from 'vue-toastification'
 import api from '../services/api'
+import RideDetailModal from '../components/RideDetailModal.vue'
 
 const authStore = useAuthStore()
 const toast = useToast()
+
+const selectedRide = ref<any | null>(null)
 
 // Feed state
 const feedItems = ref<any[]>([])
@@ -543,16 +546,23 @@ watch(selectedSeason, () => {
               </div>
             </div>
 
-            <div class="ride-action" v-if="authStore.isAuthenticated() && authStore.user?.userId !== item.authorId">
+            <div class="ride-action">
               <button 
-                v-if="!item.isJoined" 
+                type="button"
+                class="btn-view-route" 
+                @click="selectedRide = item"
+              >
+                🗺️ Маршрут и GPX-трек
+              </button>
+              <button 
+                v-if="authStore.isAuthenticated() && authStore.user?.userId !== item.authorId && !item.isJoined" 
                 class="btn-join-ride" 
                 @click="joinRide(item)"
               >
-                🏍️ Присоединиться к заезду
+                🏍️ Присоединиться
               </button>
-              <span v-else class="already-joined-badge">
-                ✅ Вы в списке участников
+              <span v-else-if="item.isJoined" class="already-joined-badge">
+                ✅ Вы участник
               </span>
             </div>
           </div>
@@ -643,10 +653,34 @@ watch(selectedSeason, () => {
         <button class="lightbox-close" @click="previewImage = null">✕</button>
       </div>
     </div>
+
+    <!-- Ride Detail & GPX Modal -->
+    <RideDetailModal
+      v-if="selectedRide"
+      :ride="selectedRide"
+      @close="selectedRide = null"
+      @joined="() => { if (selectedRide) selectedRide.isJoined = true }"
+    />
   </div>
 </template>
 
 <style scoped>
+.btn-view-route {
+  padding: 8px 14px;
+  background: rgba(255, 107, 0, 0.15);
+  border: 1px solid rgba(255, 107, 0, 0.4);
+  color: #ff8c42;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-view-route:hover {
+  background: rgba(255, 107, 0, 0.3);
+  color: #fff;
+}
+
 .feed-view-page {
   max-width: 820px;
   margin: 0 auto;

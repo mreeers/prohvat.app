@@ -29,6 +29,11 @@ const latitude = ref<number | null>(null)
 const longitude = ref<number | null>(null)
 
 const isCreating = ref(false)
+const gpxFile = ref<File | null>(null)
+const gpxFileName = ref('')
+const gpxDistanceKm = ref<number | null>(null)
+const gpxXmlContent = ref('')
+let gpxPolyline: any = null
 
 const setDefaultDate = () => {
   const d = new Date()
@@ -74,11 +79,102 @@ const initMap = () => {
       if (startPlacemark) {
         startPlacemark.geometry.setCoordinates(coords)
       } else {
-        startPlacemark = new ymaps.Placemark(coords, {}, { preset: 'islands#redStretchyIcon' })
+        startPlacemark = new ymaps.Placemark(coords, { balloonContent: 'Точка сбора' }, { preset: 'islands#redStretchyIcon' })
         map.geoObjects.add(startPlacemark)
       }
     })
   })
+}
+
+const handleGpxChange = (e: Event) => {
+  const input = e.target as HTMLInputElement
+  if (input.files && input.files[0]) {
+    const file = input.files[0]
+    gpxFile.value = file
+    gpxFileName.value = file.name
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const xml = event.target?.result as string
+      gpxXmlContent.value = xml
+      parseAndDisplayGpx(xml)
+    }
+    reader.readAsText(file)
+  }
+}
+
+const clearGpx = () => {
+  gpxFile.value = null
+  gpxFileName.value = ''
+  gpxDistanceKm.value = null
+  gpxXmlContent.value = ''
+  if (map && gpxPolyline) {
+    map.geoObjects.remove(gpxPolyline)
+    gpxPolyline = null
+  }
+}
+
+const calcDistKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const R = 6371
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLon = (lon2 - lon1) * Math.PI / 180
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  return R * c
+}
+
+const parseAndDisplayGpx = (xml: string) => {
+  try {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(xml, 'text/xml')
+    const trkpts = doc.querySelectorAll('trkpt, wpt')
+    const coords: number[][] = []
+
+    trkpts.forEach(pt => {
+      const lat = parseFloat(pt.getAttribute('lat') || '0')
+      const lon = parseFloat(pt.getAttribute('lon') || '0')
+      if (lat && lon) {
+        coords.push([lat, lon])
+      }
+    })
+
+    if (coords.length > 0) {
+      latitude.value = coords[0][0]
+      longitude.value = coords[0][1]
+
+      let total = 0
+      for (let i = 1; i < coords.length; i++) {
+        total += calcDistKm(coords[i-1][0], coords[i-1][1], coords[i][0], coords[i][1])
+      }
+      gpxDistanceKm.value = Math.round(total * 10) / 10
+
+      if (map && ymaps) {
+        if (gpxPolyline) map.geoObjects.remove(gpxPolyline)
+        gpxPolyline = new ymaps.Polyline(coords, {
+          balloonContent: `Трек: ${gpxDistanceKm.value} км`
+        }, {
+          strokeColor: '#ff6b00',
+          strokeWidth: 4,
+          strokeOpacity: 0.95
+        })
+        map.geoObjects.add(gpxPolyline)
+        map.setBounds(gpxPolyline.geometry.getBounds(), { checkZoomRange: true, zoomMargin: 20 })
+
+        if (startPlacemark) {
+          startPlacemark.geometry.setCoordinates(coords[0])
+        } else {
+          startPlacemark = new ymaps.Placemark(coords[0], { balloonContent: 'Старт маршрута' }, { preset: 'islands#darkOrangeDotIcon' })
+          map.geoObjects.add(startPlacemark)
+        }
+      }
+      toast.info(`Трек загружен: ${coords.length} точек, ~${gpxDistanceKm.value} км`)
+    }
+  } catch (err) {
+    console.error('Failed to parse GPX', err)
+    toast.error('Не удалось прочитать GPX файл')
+  }
 }
 
 onMounted(() => {
@@ -123,13 +219,27 @@ const submitRide = async () => {
       latitude: latitude.value,
       longitude: longitude.value,
       cityId: cityId.value,
-      maxMembers: maxMembers.value
+      maxMembers: maxMembers.value,
+      gpxTrackPath: gpxXmlContent.value || null
     }
     
-    await api.post('/rides', payload, {
+    const res = await api.post('/rides', payload, {
       headers: { 'Authorization': `Bearer ${authStore.token}` }
     })
     
+    // If gpx file uploaded, also post to /api/rides/{id}/gpx for binary S3 storage
+    if (gpxFile.value && res.data?.id) {
+      try {
+        const formData = new FormData()
+        formData.append('file', gpxFile.value)
+        await api.post(`/rides/${res.data.id}/gpx`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+      } catch (err) {
+        console.warn('Could not upload binary GPX to S3, using XML string fallback', err)
+      }
+    }
+
     toast.success("Покатушка успешно создана!")
     router.push('/')
   } catch (err: any) {
@@ -197,6 +307,39 @@ const submitRide = async () => {
             <label>Макс. участников</label>
             <input type="number" v-model="maxMembers" min="1" max="1000" class="input-field" />
           </div>
+        </div>
+
+        <!-- GPX Track Upload -->
+        <div class="form-group gpx-upload-group">
+          <label>GPX-трек маршрута (опционально)</label>
+          <div class="gpx-box">
+            <input
+              type="file"
+              id="gpx-file"
+              accept=".gpx"
+              class="hidden-file-input"
+              @change="handleGpxChange"
+            />
+            <label for="gpx-file" class="gpx-label">
+              <span class="gpx-icon">🗺️</span>
+              <span v-if="gpxFileName" class="gpx-name">
+                {{ gpxFileName }} <strong v-if="gpxDistanceKm">({{ gpxDistanceKm }} км)</strong>
+              </span>
+              <span v-else class="gpx-placeholder">
+                Нажмите для загрузки .gpx файла
+              </span>
+            </label>
+            <button
+              v-if="gpxFileName"
+              type="button"
+              class="btn-remove-gpx"
+              title="Удалить трек"
+              @click="clearGpx"
+            >
+              ✕
+            </button>
+          </div>
+          <small class="gpx-hint">При загрузке трека точка сбора и маршрут установятся автоматически на карте.</small>
         </div>
 
         <button @click="submitRide" :disabled="isCreating" class="btn-primary mt-4 w-full text-lg py-3">
@@ -279,6 +422,54 @@ h2 {
 h3 {
   margin: 0 0 5px 0;
   color: var(--accent-primary);
+}
+.gpx-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(255, 107, 0, 0.4);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.hidden-file-input {
+  display: none;
+}
+.gpx-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  flex: 1;
+  font-size: 0.9rem;
+}
+.gpx-icon {
+  font-size: 1.4rem;
+}
+.gpx-name {
+  color: #ff8c42;
+  font-weight: 500;
+}
+.gpx-placeholder {
+  color: #aaa;
+}
+.btn-remove-gpx {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #aaa;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+}
+.btn-remove-gpx:hover {
+  background: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+.gpx-hint {
+  font-size: 0.78rem;
+  color: #888;
+  margin-top: 4px;
 }
 @media (max-width: 768px) {
   .form-layout {

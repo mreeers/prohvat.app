@@ -31,6 +31,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<ConversationParticipant> ConversationParticipants => Set<ConversationParticipant>();
     public DbSet<UserBlock> UserBlocks => Set<UserBlock>();
     public DbSet<RideInvite> RideInvites => Set<RideInvite>();
+    public DbSet<Achievement> Achievements => Set<Achievement>();
+    public DbSet<UserAchievement> UserAchievements => Set<UserAchievement>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -212,6 +214,22 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.HasOne(e => e.Ride)
                   .WithMany()
                   .HasForeignKey(e => e.RideId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ------------------------------
+        // Gamification / Achievements Configuration
+        // ------------------------------
+        modelBuilder.Entity<UserAchievement>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.AchievementId });
+            entity.HasOne(e => e.User)
+                  .WithMany(u => u.Achievements)
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Achievement)
+                  .WithMany()
+                  .HasForeignKey(e => e.AchievementId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 

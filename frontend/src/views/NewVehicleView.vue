@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import api from '../services/api'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import TuningConfigEditor from '../components/TuningConfigEditor.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -15,6 +16,12 @@ const categories = ref<any[]>([])
 const odometerType = ref<number>(1)
 const maintenanceInterval = ref<number>(1000)
 const selectedFile = ref<File | null>(null)
+const technicalConfigJson = ref('{}')
+
+const selectedCategoryName = computed(() => {
+  const cat = categories.value.find(c => c.id === categoryId.value)
+  return cat ? cat.name : ''
+})
 
 onMounted(async () => {
   try {
@@ -43,6 +50,7 @@ const submit = async () => {
     formData.append('year', year.value.toString())
     formData.append('odometerType', odometerType.value.toString())
     formData.append('maintenanceInterval', maintenanceInterval.value.toString())
+    formData.append('technicalConfigJson', technicalConfigJson.value)
     if (selectedFile.value) {
       formData.append('image', selectedFile.value)
     }
@@ -98,6 +106,15 @@ const submit = async () => {
         <label>Фотография техники</label>
         <input type="file" accept="image/*" @change="handleFileChange" class="file-input" />
       </div>
+
+      <!-- Category-aware tuning configurator -->
+      <TuningConfigEditor
+        :initialConfigJson="technicalConfigJson"
+        :categoryName="selectedCategoryName"
+        :readOnly="false"
+        @configUpdated="(json: string) => { technicalConfigJson = json }"
+      />
+
       <button type="submit" class="btn-primary">Сохранить</button>
     </form>
   </div>

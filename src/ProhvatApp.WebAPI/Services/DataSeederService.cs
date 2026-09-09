@@ -157,6 +157,8 @@ public class DataSeederService : IHostedService
         if (await context.Users.AnyAsync(u => u.Email == "alex@prohvat.app", cancellationToken))
         {
             await EnsureMongoLogsSeededAsync(logRepo, cancellationToken);
+            await EnsureAchievementsSeededAsync(context, cancellationToken);
+            await EnsureRideGpxAndTuningSeededAsync(context, cancellationToken);
             _logger.LogInformation("Demo users already exist. Skipping Postgres demo seeding.");
             return;
         }
@@ -572,6 +574,220 @@ public class DataSeederService : IHostedService
                 VideoUrls = new List<string>()
             }
         };
+    }
+
+    private async Task EnsureAchievementsSeededAsync(ApplicationDbContext context, CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (!await context.Achievements.AnyAsync(cancellationToken))
+            {
+                _logger.LogInformation("Seeding default achievements...");
+                var achievements = new List<Achievement>
+                {
+                    new Achievement
+                    {
+                        Id = Guid.Parse("f0000001-0000-0000-0000-000000000001"),
+                        Title = "Железная задница",
+                        Description = "Преодолел более 150 км за один эпичный рейд без сходов",
+                        Icon = "🏍️",
+                        Category = "General",
+                        Points = 50
+                    },
+                    new Achievement
+                    {
+                        Id = Guid.Parse("f0000002-0000-0000-0000-000000000002"),
+                        Title = "Утопленник",
+                        Description = "Затопил технику в броду, успешно эвакуировал и завел прямо в лесу",
+                        Icon = "🌊",
+                        Category = "Enduro",
+                        Points = 30
+                    },
+                    new Achievement
+                    {
+                        Id = Guid.Parse("f0000003-0000-0000-0000-000000000003"),
+                        Title = "Первый лед",
+                        Description = "Открыл зимний сезон парным дрифтом по ледовому кольцу",
+                        Icon = "❄️",
+                        Category = "Drift",
+                        Points = 40
+                    },
+                    new Achievement
+                    {
+                        Id = Guid.Parse("f0000004-0000-0000-0000-000000000004"),
+                        Title = "Покоритель вершин",
+                        Description = "Успешный подъем на скалы или горный кулуар в хард-эндуро или на снегоходе",
+                        Icon = "🏔️",
+                        Category = "Enduro",
+                        Points = 50
+                    },
+                    new Achievement
+                    {
+                        Id = Guid.Parse("f0000005-0000-0000-0000-000000000005"),
+                        Title = "Царь гаража",
+                        Description = "Собрал боевой гараж из 2+ единиц техники с детальным тюнинг-конфигом",
+                        Icon = "🔧",
+                        Category = "General",
+                        Points = 35
+                    },
+                    new Achievement
+                    {
+                        Id = Guid.Parse("f0000006-0000-0000-0000-000000000006"),
+                        Title = "Лидер стаи",
+                        Description = "Организовал групповой заезд и собрал команду проверенных райдеров",
+                        Icon = "👥",
+                        Category = "General",
+                        Points = 45
+                    }
+                };
+
+                context.Achievements.AddRange(achievements);
+                await context.SaveChangesAsync(cancellationToken);
+            }
+
+            if (!await context.UserAchievements.AnyAsync(cancellationToken))
+            {
+                var users = await context.Users.ToListAsync(cancellationToken);
+                var alex = users.FirstOrDefault(u => u.Email == "alex@prohvat.app");
+                var daria = users.FirstOrDefault(u => u.Email == "daria@prohvat.app");
+                var ivan = users.FirstOrDefault(u => u.Email == "ivan@prohvat.app");
+                var sergey = users.FirstOrDefault(u => u.Email == "sergey@prohvat.app");
+
+                var userAchievements = new List<UserAchievement>();
+                if (alex != null)
+                {
+                    userAchievements.Add(new UserAchievement { UserId = alex.Id, AchievementId = Guid.Parse("f0000005-0000-0000-0000-000000000005"), EarnedAt = DateTime.UtcNow.AddDays(-10) });
+                    userAchievements.Add(new UserAchievement { UserId = alex.Id, AchievementId = Guid.Parse("f0000006-0000-0000-0000-000000000006"), EarnedAt = DateTime.UtcNow.AddDays(-5) });
+                    userAchievements.Add(new UserAchievement { UserId = alex.Id, AchievementId = Guid.Parse("f0000004-0000-0000-0000-000000000004"), EarnedAt = DateTime.UtcNow.AddDays(-2) });
+                    userAchievements.Add(new UserAchievement { UserId = alex.Id, AchievementId = Guid.Parse("f0000003-0000-0000-0000-000000000003"), EarnedAt = DateTime.UtcNow.AddDays(-1) });
+                }
+                if (daria != null)
+                {
+                    userAchievements.Add(new UserAchievement { UserId = daria.Id, AchievementId = Guid.Parse("f0000003-0000-0000-0000-000000000003"), EarnedAt = DateTime.UtcNow.AddDays(-4) });
+                    userAchievements.Add(new UserAchievement { UserId = daria.Id, AchievementId = Guid.Parse("f0000005-0000-0000-0000-000000000005"), EarnedAt = DateTime.UtcNow.AddDays(-8) });
+                }
+                if (ivan != null)
+                {
+                    userAchievements.Add(new UserAchievement { UserId = ivan.Id, AchievementId = Guid.Parse("f0000002-0000-0000-0000-000000000002"), EarnedAt = DateTime.UtcNow.AddDays(-14) });
+                    userAchievements.Add(new UserAchievement { UserId = ivan.Id, AchievementId = Guid.Parse("f0000004-0000-0000-0000-000000000004"), EarnedAt = DateTime.UtcNow.AddDays(-3) });
+                }
+                if (sergey != null)
+                {
+                    userAchievements.Add(new UserAchievement { UserId = sergey.Id, AchievementId = Guid.Parse("f0000001-0000-0000-0000-000000000001"), EarnedAt = DateTime.UtcNow.AddDays(-20) });
+                    userAchievements.Add(new UserAchievement { UserId = sergey.Id, AchievementId = Guid.Parse("f0000004-0000-0000-0000-000000000004"), EarnedAt = DateTime.UtcNow.AddDays(-6) });
+                }
+
+                context.UserAchievements.AddRange(userAchievements);
+                await context.SaveChangesAsync(cancellationToken);
+                _logger.LogInformation("Demo achievements assigned successfully!");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning($"Could not seed achievements: {ex.Message}");
+        }
+    }
+
+    private async Task EnsureRideGpxAndTuningSeededAsync(ApplicationDbContext context, CancellationToken cancellationToken)
+    {
+        try
+        {
+            // Update rides with GPX tracks
+            var rideEnduro = await context.Rides.FirstOrDefaultAsync(r => r.Id == Guid.Parse("eeee0001-0000-0000-0000-000000000001"), cancellationToken);
+            if (rideEnduro != null && string.IsNullOrWhiteSpace(rideEnduro.GpxTrackPath))
+            {
+                rideEnduro.GpxTrackPath = GenerateEnduroGpx();
+            }
+
+            var rideDrift = await context.Rides.FirstOrDefaultAsync(r => r.Id == Guid.Parse("eeee0002-0000-0000-0000-000000000002"), cancellationToken);
+            if (rideDrift != null && string.IsNullOrWhiteSpace(rideDrift.GpxTrackPath))
+            {
+                rideDrift.GpxTrackPath = GenerateDriftGpx();
+            }
+
+            // Update vehicles with tuning configs
+            var vehicles = await context.Vehicles.ToListAsync(cancellationToken);
+            foreach (var v in vehicles)
+            {
+                if (v.Brand == "KTM" && (string.IsNullOrWhiteSpace(v.TechnicalConfigJson) || v.TechnicalConfigJson == "{}"))
+                {
+                    v.TechnicalConfigJson = "{\"suspension\":\"WP XACT Pro (ревавлинг клапанов)\",\"protection\":\"Комплект Арма (радиаторы + картер)\",\"tires\":\"Mitas 754 + Tubliss\",\"exhaust\":\"FMF Titanium Powercore\",\"carburetor\":\"TPI инжектор + прошивка TSP\"}";
+                }
+                else if (v.Brand == "ВАЗ" && v.Model.Contains("2105") && (string.IsNullOrWhiteSpace(v.TechnicalConfigJson) || !v.TechnicalConfigJson.Contains("steering")))
+                {
+                    v.TechnicalConfigJson = "{\"steering\":\"Красноярский выворот\",\"differential\":\"Заварка 4.1\",\"handbrake\":\"Гидроручник в контур с регулятором\",\"engine\":\"16v 1.6 Шеснарь (130 л.с.)\",\"chassis\":\"Болтовой каркас, распорки стаканов\"}";
+                }
+                else if (v.Brand == "ВАЗ" && v.Model.Contains("2107") && (string.IsNullOrWhiteSpace(v.TechnicalConfigJson) || !v.TechnicalConfigJson.Contains("steering")))
+                {
+                    v.TechnicalConfigJson = "{\"steering\":\"Рычаги Турботема Дрифт\",\"differential\":\"Заварка 4.3\",\"handbrake\":\"Гидроручник Create Tech\",\"engine\":\"1.6 Карбюратор Спорт\",\"chassis\":\"Ковши Sparco, пружины Нива -50\"}";
+                }
+                else if (v.Brand.Contains("Ski-Doo") && (string.IsNullOrWhiteSpace(v.TechnicalConfigJson) || v.TechnicalConfigJson == "{}"))
+                {
+                    v.TechnicalConfigJson = "{\"track\":\"Зацеп 3.0 дюйма PowderMax\",\"skis\":\"Blade DS+ горные\",\"bumpers\":\"Усиленный бампер Voevoda\",\"riser\":\"Проставка руля 165 мм\"}";
+                }
+                else if (v.Brand == "Husqvarna" && (string.IsNullOrWhiteSpace(v.TechnicalConfigJson) || v.TechnicalConfigJson == "{}"))
+                {
+                    v.TechnicalConfigJson = "{\"suspension\":\"WP XACT закрытый картридж\",\"protection\":\"Защита радиаторов Hard Glide + картер Moose\",\"tires\":\"Michelin Enduro Medium + Mousse\",\"exhaust\":\"Сток Akrapovic\"}";
+                }
+            }
+
+            await context.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Ride GPX tracks and tuning configs updated successfully!");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning($"Could not update GPX and tuning configs: {ex.Message}");
+        }
+    }
+
+    private static string GenerateEnduroGpx()
+    {
+        return @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<gpx version=""1.1"" creator=""Prohvat.app"" xmlns=""http://www.topografix.com/GPX/1/1"">
+  <trk>
+    <name>Хард-эндуро сбор на карьере</name>
+    <trkseg>
+      <trkpt lat=""56.8389"" lon=""60.6057""><ele>260</ele></trkpt>
+      <trkpt lat=""56.8402"" lon=""60.6085""><ele>264</ele></trkpt>
+      <trkpt lat=""56.8425"" lon=""60.6120""><ele>275</ele></trkpt>
+      <trkpt lat=""56.8450"" lon=""60.6175""><ele>290</ele></trkpt>
+      <trkpt lat=""56.8485"" lon=""60.6230""><ele>310</ele></trkpt>
+      <trkpt lat=""56.8520"" lon=""60.6300""><ele>335</ele></trkpt>
+      <trkpt lat=""56.8560"" lon=""60.6380""><ele>360</ele></trkpt>
+      <trkpt lat=""56.8590"" lon=""60.6430""><ele>385</ele></trkpt>
+      <trkpt lat=""56.8625"" lon=""60.6490""><ele>392</ele></trkpt>
+      <trkpt lat=""56.8650"" lon=""60.6550""><ele>410</ele></trkpt>
+      <trkpt lat=""56.8680"" lon=""60.6620""><ele>425</ele></trkpt>
+      <trkpt lat=""56.8710"" lon=""60.6690""><ele>435</ele></trkpt>
+      <trkpt lat=""56.8740"" lon=""60.6750""><ele>420</ele></trkpt>
+      <trkpt lat=""56.8780"" lon=""60.6820""><ele>440</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>";
+    }
+
+    private static string GenerateDriftGpx()
+    {
+        return @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<gpx version=""1.1"" creator=""Prohvat.app"" xmlns=""http://www.topografix.com/GPX/1/1"">
+  <trk>
+    <name>Зимний ночной дрифт по ледовому кольцу</name>
+    <trkseg>
+      <trkpt lat=""55.7558"" lon=""37.6173""><ele>150</ele></trkpt>
+      <trkpt lat=""55.7570"" lon=""37.6195""><ele>150</ele></trkpt>
+      <trkpt lat=""55.7585"" lon=""37.6230""><ele>150</ele></trkpt>
+      <trkpt lat=""55.7592"" lon=""37.6275""><ele>150</ele></trkpt>
+      <trkpt lat=""55.7588"" lon=""37.6320""><ele>150</ele></trkpt>
+      <trkpt lat=""55.7572"" lon=""37.6350""><ele>150</ele></trkpt>
+      <trkpt lat=""55.7550"" lon=""37.6355""><ele>150</ele></trkpt>
+      <trkpt lat=""55.7530"" lon=""37.6330""><ele>150</ele></trkpt>
+      <trkpt lat=""55.7522"" lon=""37.6280""><ele>150</ele></trkpt>
+      <trkpt lat=""55.7528"" lon=""37.6230""><ele>150</ele></trkpt>
+      <trkpt lat=""55.7542"" lon=""37.6190""><ele>150</ele></trkpt>
+      <trkpt lat=""55.7558"" lon=""37.6173""><ele>150</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>";
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

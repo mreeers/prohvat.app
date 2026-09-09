@@ -27,6 +27,8 @@ public interface IApplicationDbContext
     DbSet<ConversationParticipant> ConversationParticipants { get; }
     DbSet<UserBlock> UserBlocks { get; }
     DbSet<RideInvite> RideInvites { get; }
+    DbSet<Achievement> Achievements { get; }
+    DbSet<UserAchievement> UserAchievements { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import LikeButton from '../components/LikeButton.vue'
 import CommentSection from '../components/CommentSection.vue'
+import TuningConfigEditor from '../components/TuningConfigEditor.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -125,6 +126,15 @@ onMounted(fetchVehicle)
           </div>
         </div>
       </div>
+
+      <!-- Tuning Configurator -->
+      <TuningConfigEditor
+        :vehicleId="vehicle.id"
+        :initialConfigJson="vehicle.technicalConfigJson"
+        :categoryName="vehicle.categoryName"
+        :readOnly="!isOwner"
+        @configUpdated="(json: string) => { vehicle.technicalConfigJson = json }"
+      />
 
       <!-- Add Log Form (owner only) -->
       <div v-if="showLogForm && isOwner" class="glass-panel log-form">
